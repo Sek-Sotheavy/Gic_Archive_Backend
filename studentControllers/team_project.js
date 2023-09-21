@@ -86,10 +86,31 @@ const displayById = async (req, res) => {
                 }
         });
 }
+const getbyCourse = async (req, res) => {
+        const course_name = req.body.course_name;
+        const query = 'SELECT cl.*, c.course_name from courses c join classTeam_project cl WHERE c.course_id = cl.course_id AND c.course_name =? '
+        db.query(query, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching team project:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const thesis = results[0];
+                                console.log('team_project:', thesis);
+                                res.send(results);
+                        } else {
+                                console.log('Team project not found');
+                        }
+                }
+        })
+}
+
 module.exports = {
         create,
         update,
         remove,
         displayAll,
-        displayById
+        displayById,
+        getbyCourse
+
 }
