@@ -70,7 +70,7 @@ const getByName = async (req, res) => {
         })
 }
 
-const upadate = async (req, res) => {
+const update = async (req, res) => {
         const id = req.body.id;
         const email = req.body.email;
         const gender = req.body.gender;
@@ -101,7 +101,7 @@ const remove = async (req, res) => {
 }
 module.exports = {
         DisplayAll,
-        upadate,
+        update,
         remove,
         getById,
         getByName
