@@ -58,7 +58,7 @@ const displayById = async (req, res) => {
 }
 const SearchbyField = async (req, res) => {
         const field = req.body.field;
-        const selectQuery = 'SELECT * FROM thesis WHERE field= ?';
+        const selectQuery = 'SELECT t.*,s.username AS student_username, te.username AS teacher_username FROM thesis t  JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id WHERE t.field = ?';
 
         db.query(selectQuery, [field], (err, results) => {
                 if (err) {

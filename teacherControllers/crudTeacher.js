@@ -52,16 +52,16 @@ const getById = async (req, res) => {
 
 }
 const getByName = async (req, res) => {
-        const name = req.body.name;
-        const query = "Select * from teachers where username like '%?%' ";
+        const name = req.body.username;
+        const query = "Select * from teachers where username = ?  ";
         db.query(query, [name], (err, results) => {
                 if (err) {
                         console.error('Error fetching teacher:', err);
                 }
                 else {
                         if (results.length > 0) {
-                                const student = results[0];
-                                console.log('Teacher:', student);
+                                const teacher = results[0];
+                                console.log('Teacher:', teacher);
                                 res.send(results);
                         } else {
                                 console.log('Teacher not found');
@@ -69,8 +69,17 @@ const getByName = async (req, res) => {
                 }
         })
 }
+const getCountTeacher = async (req, res) => {
+        db.query('SELECT COUNT(*) as teacherCount FROM teachers', (err, results) => {
 
-const upadate = async (req, res) => {
+                if (err) {
+                        res.status(500).send('Error fetching teacher count');
+                } else {
+                        res.json({ teacherCount: results[0].teacherCount });
+                }
+        })
+}
+const update = async (req, res) => {
         const id = req.body.id;
         const email = req.body.email;
         const gender = req.body.gender;
@@ -101,8 +110,9 @@ const remove = async (req, res) => {
 }
 module.exports = {
         DisplayAll,
-        upadate,
+        update,
         remove,
         getById,
-        getByName
+        getByName,
+        getCountTeacher,
 }  
