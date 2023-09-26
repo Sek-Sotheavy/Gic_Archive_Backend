@@ -98,11 +98,13 @@ const remove = async (req, res) => {
                 }
         })
 }
+
 module.exports = {
         displayAll,
         getbyId,
         getbyName,
         getbyGeneration,
         update,
-        remove
+        remove,
+     
 }
