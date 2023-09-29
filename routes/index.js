@@ -14,8 +14,10 @@ const course = require('../controllers/course');
 const project = require('../studentControllers/team_project');
 const rating = require('../controllers/rating');
 const role = require('../controllers/role');
+const doc = require('../studentControllers/document');
 const fs = require('fs');
 const moment = require('moment');
+const { request } = require('http');
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -42,8 +44,9 @@ router.post('/signup/student', upload.single('image'), student.signup);
 
 //student 
 router.get('/student/all', studentList.displayAll);
-router.get('/student/:id', studentList.getbyId);
-router.post('/student/name', studentList.getbyName);
+router.get('/student/:id', studentList.getbyId, doc.display);
+router.post('/student/all/name', studentList.getbyName);
+router.post('/student/all/generation', studentList.getbyGeneration);
 router.post('/student/delete/:id', studentList.remove);
 router.post('/student/update/:id', studentList.update);
 
@@ -52,46 +55,19 @@ router.get('/teacher/all', teachers.DisplayAll);
 router.post('/teacher/update', teachers.update);
 router.post('/teacher/delete/:id', teachers.remove);
 router.get('/teacher/:id', teachers.getById);
-router.post('/teacher/name', teachers.getByName);
+router.post('/teacher/all/name', teachers.getByName);
+router.get('/teacher/count', teachers.getCountTeacher);
 //file
 // router.use(upload_file());
 router.get('/like', (req, res) => {
         res.sendFile(__dirname + '/index.html');
 });
 //thesis
-// router.post('/thesis/create', upload.single('file'), thesis.create);
-router.post('/thesis/create', uploads.single('file'), async (req, res) => {
-
-        // const pdfMimeType = req.file.mimetype;
-        const pdfFilePath = req.file.path;
-        const filename = req.file.originalname;
-        // const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-        const date = moment().format("YYYY-MM-DD hh:mm:ss");
-        const { title, username, descr, field, company, tags, github_url } = req.body;
-
-        try {
-                // Insert into 'thesis' and reference 'courses' and 'documents' tables
-                db.promise().query(
-                        'INSERT INTO thesis(title, student_id, descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =?),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =?))',
-                        [title, username, descr, field, company, tags, github_url,pdfFilePath ]
-                );
-
-                // Insert into 'documents' table
-                 db.promise().query(
-                        'INSERT INTO documents(fileName, filepath, filetype, upload_date) VALUES (?,?,?,?)',
-                        [filename,pdfFilePath,pdfMimeType, date]
-                );
-
-                res.json({ message: 'Create successful' });
-        }
-        catch (error) {
-                console.error('Error creating thesis and documents:', error);
-                res.status(500).json({ message: 'An error occurred while creating the thesis and documents.' });
-        }
-});
+router.post('/thesis/create', upload.single('file'), thesis.create);
 router.get('/thesis/all', thesis.displayThesis);
 router.get('/thesis/all/:id', thesis.displayById);
-router.post('/thesis/field', thesis.SearchbyField);
+router.post('/thesis/all/field', thesis.SearchbyField);
+router.post('/thesis/all/generation')
 router.post('/thesis/delete/:id', thesis.remove);
 
 //course
@@ -114,15 +90,18 @@ router.post('/project/create', upload.single('file'), project.create);
 router.post('/team_project/update', project.update);
 router.post('/team_project/delete/:id', project.remove);
 router.get('/team_project/:id', project.displayById);
+router.post('/project/all/bycourse', project.getbyCourse);
+
 
 //comment
-router.post('/comment/create',comment.create );
-router.post('/comment/update/:id',comment.update);
+router.post('/comment/create', comment.create);
+router.post('/comment/update/:id', comment.update);
 router.post('/comment/delete/:id', comment.remove);
 router.get('/comment/:id', comment.getbyId);
 router.get('/comment/all', comment.displayAll);
 
 //rating
-router.post('/like',rating.create);
+router.post('/like', rating.create);
+
 
 module.exports = router;
