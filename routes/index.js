@@ -73,7 +73,7 @@ router.post('/thesis/delete/:id', thesis.remove);
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
-router.post('/course/create', course.create);
+router.post('/course/create', upload.single('image'),course.create);
 router.post('/course/remove/:id', course.remove);
 router.post('/course/update', course.update);
 //role
@@ -102,6 +102,7 @@ router.get('/comment/all', comment.displayAll);
 
 //rating
 router.post('/like', rating.create);
+router.get('/like/:id', rating.getbyId);
 
 
 module.exports = router;
