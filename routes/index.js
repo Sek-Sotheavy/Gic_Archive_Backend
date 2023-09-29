@@ -14,6 +14,7 @@ const photo = require('../controllers/photo');
 const role = require('../controllers/role');
 const member = require('../studentControllers/memberproject');
 const doc = require('../studentControllers/document');
+const user = require('../controllers/user');
 const dashboard = require('../controllers/dashboard');
 
 const moment = require('moment');
@@ -50,6 +51,7 @@ router.post('/admin/admin/student/all/generation', studentList.getbyGeneration);
 router.post('/admin/student/delete/:id', studentList.remove);
 router.post('/admin/student/update/:id', studentList.update);
 
+router.get('/user/getme', user.getMe);
 
 //teacher-
 router.get('/admin/teacher/all', teachers.DisplayAll);
@@ -89,11 +91,32 @@ router.post('/role/update/:id', role.update);
 //project
 // router.post('/project/create', upload.single('pdf'), project.create);
 router.get('/admin/project/all', project.displayAll);
-router.post('/admin/project/create', upload.single('file'), project.create);
-// router.post('/admin/project/create', upload.fields([
-//         { name: 'image' },
-//         { name: 'file' }
-// ]), project.create);
+// router.post('/admin/project/create', upload.single('file'), project.create);
+router.post('/admin/project/create', upload.fields([{ name: 'image' }, { name: 'file' }]), (req, res) => {
+        const file1 = req.files['file1'][0]; // Get the first file uploaded with the field name 'file1'
+        const file2 = req.files['file2'][0]; // Get the first file uploaded with the field name 'file2'
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        // Save file details to the database (here we'll use a simple example, adjust as needed)
+        const insertQuery = 'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)';
+        const values1 = [file1.originalname, file1.path, file1.minetype, date];
+        const values2 = [file2.body.title, file2.body.course_name, file2.body.username, file2.body.descr, file2.body.github_url, file2.path];
+
+        connection.query(insertQuery, values1, (error, results1) => {
+                if (error) {
+                        console.error('Error uploading file1:', error);
+                        res.status(500).send('Error uploading file1');
+                } else {
+                        connection.query(insertQuery, values2, (error, results2) => {
+                                if (error) {
+                                        console.error('Error uploading file2:', error);
+                                        res.status(500).send('Error uploading file2');
+                                } else {
+                                        res.status(200).send('Files uploaded successfully');
+                                }
+                        });
+                }
+        })
+});
 router.post('/admin/team_project/update', project.update);
 router.post('/admin/team_project/delete/:id', project.remove);
 router.get('/admin/team_project/:id', project.displayById);

@@ -21,11 +21,11 @@ db.query('CREATE DATABASE IF NOT EXISTS gic_archive', (createErr) => {
 });
 db.query('use gic_archive');
 
-db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255), FOREIGN KEY (role_id) REFERENCES roles(role_id) ) ', (createErr) => {
+db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255),FOREIGN KEY (role_id) REFERENCES roles(role_id) ) ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
-        //  else {
+        //  else { FOREIGN KEY (role_id) REFERENCES roles(role_id)
         //         console.log('Table created successfully');
         // }
 });
@@ -102,6 +102,14 @@ db.query("CREATE TABLE IF NOT EXISTS classTeamProject_member (member_id INT PRIM
 //         // }
 // });
 db.query("CREATE TABLE IF NOT EXISTS ratings(rating_id INT PRIMARY KEY AUTO_INCREMENT , project_id INT , student_id INT, liked TINYINT, Timestamp TIMESTAMP, FOREIGN KEY (project_id) REFERENCES classTeam_project(project_id),FOREIGN KEY (student_id) REFERENCES students(student_id))", (createErr) => {
+        if (createErr) {
+                console.error('Error creating the table:', createErr);
+        }
+        // else {
+        //         console.log('Table created successfully');
+        // }
+});
+db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREMENT,student_id int , teacher_id int, role_id int,  FOREIGN KEY (role_id) REFERENCES roles(role_id),FOREIGN KEY (student_id) REFERENCES students(student_id),FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id))", (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
