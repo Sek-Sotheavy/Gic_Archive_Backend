@@ -3,20 +3,19 @@ const moment = require('moment');
 
 const create = async (req, res) => {
 
-        const pdfMimeType = req.file.mimetype;
+        const pdfMimeType = req.file.minetype;
         const pdfFilePath = req.file.path;
         const filename = req.file.originalname;
         const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-        const { title, descr, course_name, github_url } = req.body;
+        const { title, descr, course_name, github_url, username } = req.body;
         try {
                 await db.promise().query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
                         [filename, pdfFilePath, pdfMimeType, date]
                 )
                 await db.promise().query(
-                        'INSERT INTO classTeam_project (title, course_id,descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
-                        [title, course_name, descr, github_url, pdfFilePath])
-
+                        'INSERT INTO classTeam_project (title, course_id, student_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),(SELECT student_id FROM students WHERE username =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
+                        [title, course_name, username, descr, github_url, pdfFilePath])
 
                 res.json({ message: 'Create successfully' });
         }
@@ -56,7 +55,7 @@ const remove = async (req, res) => {
 }
 const displayAll = async (req, res) => {
 
-        db.query('select cl.*, c.course_name from classTeam_project as cl JOIN courses AS c WHERE cl.course_id = c.course_id; ', (err, results) => {
+        db.query('SELECT cl.*, s.username,c.course_name FROM classteam_project cl JOIN students s join courses c WHERE s.student_id = cl.student_id AND c.course_id = cl.course_id', (err, results) => {
                 if (err) {
                         console.error('Error fetching team project:', err);
                 }
@@ -69,7 +68,7 @@ const displayAll = async (req, res) => {
 }
 const displayById = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*, co.course_name, d.filepath, fileName FROM classTeam_project AS c JOIN courses as co JOIN documents AS d  WHERE c.course_id = co.course_id AND d.doc_id = c.doc_id  AND c.project_id = ?';
+        const selectQuery = 'SELECT cl.*, course_name, t.username AS teacher_name, s.username AS student_name, d.fileName,d.filepath FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN students s ON s.student_id = cl.project_id JOIN documents d ON d.doc_id = cl.doc_id WHERE cl.project_id= ? ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {

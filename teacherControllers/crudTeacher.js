@@ -69,9 +69,8 @@ const getByName = async (req, res) => {
                 }
         })
 }
-const getCountTeacher = async (req, res) => {
-        db.query('SELECT COUNT(*) as teacherCount FROM teachers', (err, results) => {
 
+<<<<<<< HEAD
                 if (err) {
                         res.status(500).send('Error fetching teacher count');
                 } else {
@@ -79,6 +78,9 @@ const getCountTeacher = async (req, res) => {
                 }
         })
 }
+=======
+
+>>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
 const update = async (req, res) => {
         const id = req.body.id;
         const email = req.body.email;
@@ -114,5 +116,6 @@ module.exports = {
         remove,
         getById,
         getByName,
-        getCountTeacher,
+        
+
 }  
