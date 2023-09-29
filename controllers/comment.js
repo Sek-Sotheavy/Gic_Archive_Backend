@@ -9,14 +9,14 @@ const create = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { comment_id, project_id, student_id, comment_text } = req.body;
+  const { comment_id, project_id, thesis_id,student_id, comment_text } = req.body;
   
   try {
 
         const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
     const result = await db.promise().query(
-      'INSERT INTO comments (comment_id, project_id, student_id, comment_text, timestamp) VALUES (?,?,?,?,?)',
-      [comment_id, project_id, student_id, comment_text, timestamp]
+      'INSERT INTO comments (comment_id, project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?,(SELECT  project_id From classTeam_project WHERE project_id = ?), (SELECT  thesis_id From thesis WHERE thesis_id = ?),?,?,?)',
+      [comment_id, project_id,thesis_id, student_id, comment_text, timestamp]
     );
 
     console.log(result);
@@ -29,10 +29,10 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const id = req.params.id;
-    const {project_id, student_id, comment_text } = req.body;
+    const {project_id, thesis_id,student_id, comment_text } = req.body;
     const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    db.query('Update comments SET project_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
-    [project_id, student_id, comment_text, timestamp ,id], (err, results) => {
+    db.query('Update comments SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
+    [project_id,thesis_id, student_id, comment_text, timestamp ,id], (err, results) => {
         if (err) {
                 console.error('Error updating role:', err);
         } else {

@@ -76,7 +76,11 @@ router.post('/admin/thesis/delete/:id', thesis.remove);
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
+<<<<<<< HEAD
+router.post('/course/create', upload.single('image'),course.create);
+=======
 router.post('/course/create', upload.single('image'), course.create);
+>>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
 router.post('/course/remove/:id', course.remove);
 router.post('/course/update', course.update);
 router.post('/search/course', course.getbyCourse);
@@ -133,6 +137,7 @@ router.get('/comment/all', comment.displayAll);
 
 //rating
 router.post('/like', rating.create);
+router.get('/like/:id', rating.getbyId);
 
 // addmin dashboard
 router.get('/getCourseCount', dashboard.getCountCourse);

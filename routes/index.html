@@ -39,19 +39,32 @@
     </form>
     <!-- 
     <h1>Like Button</h1>
-    <button id="liked">Like</button>
-
+    <form id="likeForm" action="/like" method="POST" enctype="multipart/form-data">
+        <input type="text" name="project_id" id="project_id" placeholder="project_id">
+        <input type="text" name="student_id" id="student_id" placeholder="student_id">
+        <!--  <input type="submit" name="liked" value="true" id="liked"> -->
+        <button type="submit" id="liked">Like</button>
+    </form>
     <script>
-        document.getElementById('liked').addEventListener('click', () => {
+        document.getElementById('likeForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const project_id = document.getElementById('project_id').value;
+            const student_id = document.getElementById('student_id').value;
+            const like = document.getElementById('liked').value;
             fetch('/like', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ project_id: 1, student_id: 1 }) // Change the IDs as needed
+                body: JSON.stringify({ project_id, student_id,liked })
             })
                 .then((response) => response.json())
                 .then((data) => {
+<<<<<<< HEAD
+                    data ++;
+=======
+>>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
                     console.log(data.message);
                 })
                 .catch((error) => {
@@ -61,4 +74,9 @@
     </script> -->
 </body>
 
+<<<<<<< HEAD
+
 </html>
+=======
+</html>
+>>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
