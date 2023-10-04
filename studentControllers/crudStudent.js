@@ -34,6 +34,25 @@ const getbyId = async (req, res) => {
                 }
         })
 }
+const getStudent = async (req, res) => {
+        // const id = req.params.id;
+        const email = req.body.email;
+        const sql = 'SELECT * FROM students WHERE email = ?';
+        db.query(sql, [email], (err, results) => {
+                if (err) {
+                        console.error('Error fetching student:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const student = results[0];
+                                console.log('Student:', student);
+                                res.send(results);
+                        } else {
+                                console.log('Student not found');
+                        }
+                }
+        })
+}
 const getbyName = async (req, res) => {
         const name = req.body.name;
         const query = "Select * from students where fullname like '%?%' ";
@@ -106,5 +125,6 @@ module.exports = {
         getbyGeneration,
         update,
         remove,
-     
+        getStudent
+
 }

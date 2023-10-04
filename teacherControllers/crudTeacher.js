@@ -46,10 +46,6 @@ const getById = async (req, res) => {
                         }
                 }
         });
-
-
-
-
 }
 const getByName = async (req, res) => {
         const name = req.body.username;
@@ -69,18 +65,6 @@ const getByName = async (req, res) => {
                 }
         })
 }
-
-<<<<<<< HEAD
-                if (err) {
-                        res.status(500).send('Error fetching teacher count');
-                } else {
-                        res.json({ teacherCount: results[0].teacherCount });
-                }
-        })
-}
-=======
-
->>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
 const update = async (req, res) => {
         const id = req.body.id;
         const email = req.body.email;

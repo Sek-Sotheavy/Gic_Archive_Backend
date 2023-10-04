@@ -1,9 +1,6 @@
 const db = require('../config/db')
 const bcrypt = require('bcrypt');
-const config = require('../middleware/config');
 const UserModel = require('../studentControllers/auth');
-
-
 const jwt = require("jsonwebtoken");
 
 exports.logout = async function logout(req, res) {
@@ -22,8 +19,8 @@ exports.logout = async function logout(req, res) {
 };
 
 exports.login = async function login(req, res) {
-        const email = req.body.email;
-        const password = req.body.password;
+        // const email = req.body.email;
+        // const password = req.body.password;
         const admin = {
                 email: "admin@123",
                 password: "admin",
@@ -34,7 +31,7 @@ exports.login = async function login(req, res) {
                 res.status(404).send("You need to input your password");
         }
         if (req.body.email === admin.email && req.body.password === admin.password) {
-                const token = jwt.sign(admin, config.authentication.jwtSecret);
+                const token = jwt.sign(admin, 't0kenEncrypti0n');
                 res
                         .status(200)
                         .cookie("access_token", token, {
@@ -56,32 +53,92 @@ exports.login = async function login(req, res) {
         ) {
                 res.status(401).json({ message: "Incorrect Email" });
         } else {
-                const { email, password } = req.body;
+                var email = req.body.email;
+                var role = req.body.role;
+                var password = req.body.password;
+                const isValidPassword = await bcrypt.hash(password, 10);
+                db.query('SELECT * FROM users u JOIN roles r WHERE u.role_id = r.role_id AND r.role_name = ?  ', [role], (error, results) => {
+                        if (error) {
+                                res.json({
+                                        status: false,
+                                        message: 'there are some error with query'
+                                })
+                        } else {
+                                if (role === "student") {
+                                        db.query('SELECT s.*, r.role_name FROM users u JOIN students s ON s.student_id = u.student_id JOIN roles r ON s.role_id= r.role_id  WHERE  s.email = ? ', email, (error, results) => {
+                                                if (error) {
+                                                        res.json({
+                                                                status: false,
+                                                                message: 'there are some error with query'
+                                                        })
+                                                } else {
+                                                        if (results.length > 0) {
+                                                                if (isValidPassword) {
+                                                                        const first_name = results[0].first_name;
+                                                                        const last_name = results[0].last_name;
+                                                                        const name = results[0].username;
+                                                                        const gender = results[0].gender;
+                                                                        const email = results[0].email;
+                                                                        const generation = results[0].generation;
+                                                                        const role_name = results[0].role_name;
+                                                                        const token = jwt.sign({ first_name, last_name, email, name, gender, generation, role_name }, 't0kenEncrypti0n');
+                                                                        res.cookie('token', token) 
+                                                                        res.setHeader('Authorization', `Bearer ${token}`);
 
-                try {
-                        const user = await UserModel.getUserByEmail(email);
+                                                                        return res.json({
+                                                                                status: true,
+                                                                                data: results,
+                                                                                token,
+                                                                                message: 'Successfully authenticated'
+                                                                        });
 
-                        if (!user) {
-                                return res.status(401).json({ error: 'Invalid credentials' });
+                                                                }
+                                                        }
+                                                }
+                                        })
+                                }
+
+                                else if (role === "teacher") {
+                                        db.query('SELECT t.*, r.role_name FROM users u JOIN  teachers t ON t.teacher_id = u.teacher_id JOIN roles r ON t.role_id= r.role_id  WHERE  t.email = ? ', email, (error, results) => {
+                                                if (error) {
+                                                        res.json({
+                                                                status: false,
+                                                                message: 'there are some error with query'
+                                                        })
+                                                } else {
+                                                        if (results.length > 0) {
+                                                                if (isValidPassword) {
+                                                                        const first_name = results[0].first_name;
+                                                                        const last_name = results[0].last_name;
+                                                                        const name = results[0].username;
+                                                                        const gender = results[0].gender;
+                                                                        const email = results[0].email;
+                                                                        const role_name = results[0].role_name;
+                                                                        const token = jwt.sign({ first_name, last_name, email, name, gender, role_name }, 't0kenEncrypti0n');
+                                                                        res.cookie('token', token);
+                                                                        res.setHeader('Authorization', `Bearer ${token}`);
+
+                                                                        return res.json({
+                                                                                status: true,
+                                                                                data: results,
+                                                                                token,
+                                                                                message: 'Successfully authenticated'
+                                                                        });
+
+                                                                }
+                                                        }
+                                                }
+                                        })
+                                }
+                                else {
+                                        res.json({
+                                                status: false,
+                                                message: "Email does not exits"
+                                        });
+                                }
                         }
+                })
 
-                        // Compare the entered password with the hashed password
-                        // const isValidPassword = bcrypt.hash(password, user.password);
-                        const isValidPassword = await bcrypt.hash(password, 10);
-
-                        if (!isValidPassword) {
-                                return res.status(401).json({ error: 'Invalid credentials' });
-                        }
-
-                        const token = jwt.sign({ userId: user.id }, 'secret', { expiresIn: '1h' });
-                        res.setHeader('Authorization', `Bearer ${token}`);
-                        console.log(user.email);
-                        return res.status(200).json({ message: 'Login successful', token });
-
-                } catch (error) {
-                        console.error('Error during login:', error);
-                        return res.status(500).json({ error: 'Internal server error' });
-                }
         }
 
 
