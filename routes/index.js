@@ -40,8 +40,8 @@ const storages = multer.memoryStorage(); // You can configure storage as needed
 const uploads = multer({ storage });
 // 
 router.post('/login', con.login);
-router.post('/signup/teacher', upload.single('image'), teacher.signup);
-router.post('/signup/student', upload.single('image'), student.signup);
+router.post('/admin/signup/teacher', upload.single('image'), teacher.signup);
+router.post('/admin/signup/student', upload.single('image'), student.signup);
 
 //student 
 router.get('/admin/student/all', studentList.displayAll);
@@ -76,11 +76,10 @@ router.post('/admin/thesis/delete/:id', thesis.remove);
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
-<<<<<<< HEAD
+
 router.post('/course/create', upload.single('image'),course.create);
-=======
-router.post('/course/create', upload.single('image'), course.create);
->>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
+
+
 router.post('/course/remove/:id', course.remove);
 router.post('/course/update', course.update);
 router.post('/search/course', course.getbyCourse);
@@ -95,32 +94,32 @@ router.post('/role/update/:id', role.update);
 //project
 // router.post('/project/create', upload.single('pdf'), project.create);
 router.get('/admin/project/all', project.displayAll);
-// router.post('/admin/project/create', upload.single('file'), project.create);
-router.post('/admin/project/create', upload.fields([{ name: 'image' }, { name: 'file' }]), (req, res) => {
-        const file1 = req.files['file1'][0]; // Get the first file uploaded with the field name 'file1'
-        const file2 = req.files['file2'][0]; // Get the first file uploaded with the field name 'file2'
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-        // Save file details to the database (here we'll use a simple example, adjust as needed)
-        const insertQuery = 'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)';
-        const values1 = [file1.originalname, file1.path, file1.minetype, date];
-        const values2 = [file2.body.title, file2.body.course_name, file2.body.username, file2.body.descr, file2.body.github_url, file2.path];
+router.post('/admin/project/create', upload.single('file'), project.create);
+// router.post('/admin/project/create', upload.fields([{ name: 'image' }, { name: 'file' }]), (req, res) => {
+//         const file1 = req.files['file1'][0]; // Get the first file uploaded with the field name 'file1'
+//         const file2 = req.files['file2'][0]; // Get the first file uploaded with the field name 'file2'
+//         const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+//         // Save file details to the database (here we'll use a simple example, adjust as needed)
+//         const insertQuery = 'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)';
+//         const values1 = [file1.originalname, file1.path, file1.minetype, date];
+//         const values2 = [file2.body.title, file2.body.course_name, file2.body.username, file2.body.descr, file2.body.github_url, file2.path];
 
-        connection.query(insertQuery, values1, (error, results1) => {
-                if (error) {
-                        console.error('Error uploading file1:', error);
-                        res.status(500).send('Error uploading file1');
-                } else {
-                        connection.query(insertQuery, values2, (error, results2) => {
-                                if (error) {
-                                        console.error('Error uploading file2:', error);
-                                        res.status(500).send('Error uploading file2');
-                                } else {
-                                        res.status(200).send('Files uploaded successfully');
-                                }
-                        });
-                }
-        })
-});
+//         connection.query(insertQuery, values1, (error, results1) => {
+//                 if (error) {
+//                         console.error('Error uploading file1:', error);
+//                         res.status(500).send('Error uploading file1');
+//                 } else {
+//                         connection.query(insertQuery, values2, (error, results2) => {
+//                                 if (error) {
+//                                         console.error('Error uploading file2:', error);
+//                                         res.status(500).send('Error uploading file2');
+//                                 } else {
+//                                         res.status(200).send('Files uploaded successfully');
+//                                 }
+//                         });
+//                 }
+//         })
+// });
 router.post('/admin/team_project/update', project.update);
 router.post('/admin/team_project/delete/:id', project.remove);
 router.get('/admin/team_project/:id', project.displayById);

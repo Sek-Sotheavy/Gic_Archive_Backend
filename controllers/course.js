@@ -10,27 +10,7 @@ const create = async (req, res) => {
         const query = 'INSERT INTO courses (course_name, teacher_id) VALUES (?, (SELECT teacher_id FROM teachers WHERE username = ?))';
 
         try {
-<<<<<<< HEAD
-               
-                db.query(query, [course_name, username], (insertErr, results) => {
-                        if (insertErr) {
-                                console.error('Error inserting PDF file data:', insertErr);
-                                // res.status(500).json('Internal Server Error');
-                        } else {
-                                console.log('PDF file data inserted successfully');
-                                // res.status(200).json('course uploaded and saved');
-                                console.log(results);
-                        }
-                });
-                 db.query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
-                        [null, null, course_name, filename, filepath], (insertErr, results) => {
-                                if (insertErr) {
-                                        console.error('Error inserting PDF file data:', insertErr);
-                                        // res.status(500).json('Internal Server Error');
-                                } else {
-                                        console.log('PDF file data inserted successfully');
-                                        // res.status(200).json('course uploaded and saved');
-=======
+
 
                 db.query(query, [course_name, username], (Err, result) => {
                         if (Err) {
@@ -50,7 +30,7 @@ const create = async (req, res) => {
                                 } else {
                                         console.log('PDF file data inserted successfully');
                                         // res.status(200).send('course uploaded and saved');
->>>>>>> d01d87b25eb7359003594a532cfcfbcc2ccf55de
+
                                         console.log(results);
                                 }
                         });
