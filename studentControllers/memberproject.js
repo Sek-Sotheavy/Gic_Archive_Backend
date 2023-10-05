@@ -2,10 +2,12 @@ const db = require('../config/db');
 
 const addMember = (req, res) => {
         const { username, title } = req.body;
-        db.query('SELECT c.*, s.username, co.course_name  FROM classteam_project AS c JOIN students AS s JOIN classteamproject_member AS cl JOIN courses co WHERE c.project_id = cl.project_id AND s.student_id = cl.student_id AND c.course_id = co.course_id;', [title, username], (err, results) => {
+        const id = req.params.project_id;
+        db.query('INSERT INTO classteamproject_member (project_id, student_id) VALUES ((SELECT project_id from classTeam_project where project_id =?),(SELECT student_id FROM students WHERE username = ? ))', [id, username], (err, results) => {
                 if (err) {
                         console.error('Error add member:', err);
-                } else {
+                }
+                else {
                         console.log('Add member successfully');
                         res.send('Add member successfully');
                         console.log(results);

@@ -14,6 +14,20 @@ const displayThesis = async (req, res) => {
                 console.log(results);
         });
 }
+
+const display = async (req, res) => {
+
+        const email = req.params.email;
+        db.query('SELECT t.*, s.username FROM thesis t JOIN students s WHERE t.student_id = s.student_id AND s.email = ?', (err, results) => {
+                if (err) {
+                        console.error('Error fetching student:', err);
+                }
+                else {
+                        res.send(results);
+                }
+                console.log(results);
+        });
+}
 const create = async (req, res) => {
 
         const { title, username, descr, field, company, tags, github_url, teacher_name } = req.body;
@@ -87,10 +101,12 @@ const remove = async (req, res) => {
                 }
         })
 }
+
 module.exports = {
         create,
         displayThesis,
         displayById,
         SearchbyField,
-        remove
+        remove,
+        display
 }

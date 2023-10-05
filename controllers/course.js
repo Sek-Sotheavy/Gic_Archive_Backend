@@ -10,31 +10,32 @@ const create = async (req, res) => {
         const query = 'INSERT INTO courses (course_name, teacher_id) VALUES (?, (SELECT teacher_id FROM teachers WHERE username = ?))';
 
         try {
-                await db.promise().query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
+
+                db.query(query, [course_name, username], (Err, result) => {
+                        if (Err) {
+                                console.error('Error inserting PDF file data:', insertErr);
+                                // res.status(500).send('Internal Server Error');
+                        } else {
+                                console.log('PDF file data inserted successfully');
+                                // res.status(200).send('course uploaded and saved');
+                                console.log(result);
+                        }
+                });
+                db.query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
                         [null, null, course_name, filename, filepath], (insertErr, results) => {
                                 if (insertErr) {
                                         console.error('Error inserting PDF file data:', insertErr);
-                                        res.status(500).send('Internal Server Error');
+                                        // res.status(500).send('Internal Server Error');
                                 } else {
                                         console.log('PDF file data inserted successfully');
-                                        res.status(200).send('course uploaded and saved');
+                                        // res.status(200).send('course uploaded and saved');
                                         console.log(results);
                                 }
                         });
-                await db.promise().query(query, [course_name, username], (insertErr, results) => {
-                        if (insertErr) {
-                                console.error('Error inserting PDF file data:', insertErr);
-                                res.status(500).send('Internal Server Error');
-                        } else {
-                                console.log('PDF file data inserted successfully');
-                                res.status(200).send('course uploaded and saved');
-                                console.log(results);
-                        }
-                });
         }
         catch (error) {
                 console.error(error);
-                res.status(500).json({ message: 'An error occurred' });
+                // res.status(500).send({ message: 'An error occurred' });
         }
 }
 const update = async (req, res) => {
@@ -69,7 +70,7 @@ const remove = async (req, res) => {
 }
 const displayAll = async (req, res) => {
 
-        const sqlQuery = 'SELECT c.course_id, c.course_name, t.username FROM courses c JOIN teachers t WHERE c.teacher_id = t.teacher_id;';
+        const sqlQuery = 'SELECT c.*, t.username FROM courses c JOIN teachers t WHERE c.teacher_id = t.teacher_id;';
 
         db.query(sqlQuery, (error, results) => {
                 if (error) {
@@ -84,7 +85,7 @@ const displayAll = async (req, res) => {
 }
 const getbyId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*, username, p.filepath FROM courses AS c JOIN teachers AS t JOIN photo p WHERE t.teacher_id=c.teacher_id AND p.course_id =c.course_id AND c.course_id = ?';
+        const selectQuery = 'SELECT c.*, t.username, p.filepath FROM courses AS c JOIN teachers AS t JOIN photo p WHERE t.teacher_id=c.teacher_id AND p.course_id =c.course_id AND c.course_id = ?';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -101,10 +102,33 @@ const getbyId = async (req, res) => {
                 }
         })
 }
+const getbyCourse = async (req, res) => {
+        const course_name = req.body.course_name;
+        const query = 'SELECT *, username FROM courses c join teachers t where c.teacher_id=t.teacher_id AND course_name =? '
+        db.query(query, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching team project:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const thesis = results[0];
+                                console.log('team_project:', thesis);
+                                res.send(results);
+                        } else {
+                                console.log('Team project not found');
+                        }
+                }
+        })
+}
+
 module.exports = {
         create,
         remove,
         displayAll,
         update,
-        getbyId
+        getbyId,
+        getbyCourse,
+        
 }
+
+
