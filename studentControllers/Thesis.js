@@ -18,7 +18,7 @@ const displayThesis = async (req, res) => {
 const display = async (req, res) => {
 
         const email = req.params.email;
-        db.query('SELECT t.*, s.username FROM thesis t JOIN students s WHERE t.student_id = s.student_id AND s.email = ?', (err, results) => {
+        db.query('SELECT t.*,s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id WHERE s.student_id = 1; ', (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -53,7 +53,7 @@ const create = async (req, res) => {
 }
 const displayById = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE t.thesis_id= ?';
+        const selectQuery = 'SELECT t.* FROM thesis t JOIN students s ON s.student_id = t.student_id join users u ON u.student_id = s.student_id WHERE  s.email= ?;';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -91,17 +91,32 @@ const SearchbyField = async (req, res) => {
 }
 const remove = async (req, res) => {
         const id = req.params.id;
-        db.query('DELETE FROM thesis WHERE  thesis_id = ?', [id], (err, results) => {
-                if (err) {
-                        console.error('Error updating student:', err);
-                } else {
-                        console.log('Thesis delete successfully');
-                        res.send('Thesis delete successfully');
-                        console.log(results);
-                }
-        })
-}
 
+        db.query("SET FOREIGN_KEY_CHECKS=0;", (err) => {
+                if (err) {
+                        console.error("Error disabling foreign key checks:", err);
+                } else {
+                        db.query(
+                                "DELETE FROM thesis WHERE thesis_id = ? LIMIT 10 ;",
+                                [id],
+                                (err, results) => {
+                                        if (err) {
+                                                console.error("Error deleting teacher:", err);
+                                        } else {
+                                                console.log("teacher deleted successfully");
+                                                res.status(200).send("teacher deleted successfully!");
+                                                console.log(results);
+                                        }
+                                        db.query("SET FOREIGN_KEY_CHECKS=1;", (err) => {
+                                                if (err) {
+                                                        console.error("Error enabling foreign key checks:", err);
+                                                }
+                                        });
+                                }
+                        );
+                }
+        });
+};
 module.exports = {
         create,
         displayThesis,

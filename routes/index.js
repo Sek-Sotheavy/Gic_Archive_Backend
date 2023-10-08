@@ -16,6 +16,7 @@ const role = require('../controllers/role');
 const member = require('../studentControllers/memberproject');
 const dashboard = require('../controllers/dashboard');
 const auth = require('../middleware/auth');
+const adminThesis = require('../controllers/thesis');
 const joiValidation = require('../middleware/joiValidation');
 
 const moment = require('moment');
@@ -53,10 +54,10 @@ router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         });
 });
 router.post('/login', con.login, auth.ensureSignedOut, joiValidation(signInSchema));
-router.post('/admin/signup/teacher', auth.ensureSignedOut, joiValidation(signUpSchema), upload.single('image'), teacher.signup);
-router.post('/admin/signup/student', auth.ensureSignedOut, joiValidation(signUpSchema), upload.single('image'), student.signup);
-router.get('/logout', async (req, res, next) => {
-        sessionStorage.removeItem("token");
+router.post('/admin/signup/teacher', upload.single('image'), teacher.signup);
+router.post('/admin/signup/student', upload.single('image'), student.signup);
+router.post('/logout', async (req, res, next) => {
+        // sessionStorage.removeItem("token");
         return res.json({ status: "Success" });
 })
 //student 
@@ -84,7 +85,7 @@ router.get('/like', (req, res) => {
 //thesis
 router.post('/admin/thesis/create', upload.single('file'), thesis.create);
 router.get('/admin/thesis/all', thesis.displayThesis);
-router.get('/admin/thesis/all/:id', thesis.displayById);
+router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', thesis.SearchbyField);
 router.post('/admin/thesis/all/generation')
 router.post('/admin/thesis/delete/:id', thesis.remove);
@@ -92,9 +93,7 @@ router.post('/admin/thesis/delete/:id', thesis.remove);
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
-
 router.post('/course/create', upload.single('image'), course.create);
-
 router.post('/course/remove/:id', course.remove);
 router.post('/course/update', course.update);
 router.post('/search/course', course.getbyCourse);
@@ -109,14 +108,14 @@ router.post('/role/update/:id', role.update);
 //project
 // router.post('/project/create', upload.single('pdf'), project.create);
 router.get('/admin/project/all', project.displayAll);
-router.post('/admin/project/create', upload.single('file'), project.create);
-
-router.post('/admin/team_project/update', project.update);
-router.post('/admin/team_project/delete/:id', project.remove);
-router.get('/admin/team_project/:id', project.displayById);
+router.post('/admin/project/create', upload.single('file'), project.create)
+router.post('/admin/project/update', project.update);
+router.post('/admin/project/delete/:id', project.remove);
+router.get('/admin/project/:id', project.displayById);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
 
-router.post('/admin/project/addMember/:id', member.addMember);
+router.post('/project/addMember/:id', member.addMember);
+router.get('/project/member',member.CountMember);
 
 //comment
 router.post('/comment/create', comment.create);
@@ -140,6 +139,7 @@ router.get('/getMaleCount', dashboard.getMale);
 router.post('/upload/photo', upload.single('image'), photo.create);
 
 // student 
-router.get('/student/thesis/:email', thesis.display);
-
+router.get('/student/thesis/:id', thesis.displayThesis);
+router.get('/student/project', project.displayByid);
+router.get('/student/thesis', thesis.display);
 module.exports = router;

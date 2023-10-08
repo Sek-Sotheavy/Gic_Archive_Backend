@@ -53,7 +53,7 @@ const getCountCourse = async (req, res) => {
         })
 }
 const getFemale = async (req, res) => {
-        const query = 'SELECT COUNT(*) as girl FROM students WHERE gender = "female"OR gender = "F"';
+        const query = 'SELECT COUNT(*) as girl FROM students WHERE gender = "female" OR gender = "F"';
         db.query(query, (err, results) => {
                 if (err) {
                         console.error('Error fetching gender:', err);

@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const DisplayAll = async (req, res) => {
 
-        const sqlQuery = 'SELECT * FROM teachers';
+        const sqlQuery = 'SELECT * FROM teachers ';
 
         db.query(sqlQuery, (error, results) => {
                 if (error) {

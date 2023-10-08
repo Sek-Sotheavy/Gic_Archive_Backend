@@ -58,7 +58,7 @@ db.query('CREATE TABLE IF NOT EXISTS thesis (thesis_id INT PRIMARY KEY AUTO_INCR
                 console.log('Table created successfully');
         }
 });
-db.query('CREATE TABLE IF NOT EXISTS classTeam_project( project_id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), course_id INT, student_id INT, descr TEXT, github_url VARCHAR(255), doc_id  INT,  FOREIGN KEY (doc_id) REFERENCES documents(doc_id), FOREIGN KEY (student_id) REFERENCES students(student_id)) ', (createErr) => {
+db.query('CREATE TABLE IF NOT EXISTS classTeam_project( project_id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), course_id INT, descr TEXT, github_url VARCHAR(255), doc_id  INT,  FOREIGN KEY (doc_id) REFERENCES documents(doc_id)) ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
@@ -79,12 +79,12 @@ db.query("CREATE TABLE IF NOT EXISTS classTeamProject_member (member_id INT PRIM
         }
 });
 
-db.query("CREATE TABLE IF NOT EXISTS comments(comment_id INT PRIMARY KEY AUTO_INCREMENT , project_id INT ,thesis_id INT, student_id INT, comment_text TEXT, timestamp TIMESTAMP, FOREIGN KEY (project_id) REFERENCES classTeam_project(project_id),FOREIGN KEY (thesis_id) REFERENCES thesis(thesis_id),FOREIGN KEY (student_id) REFERENCES students(student_id))", (createErr) => {
-        if (createErr) {
-                console.error('Error creating the table:', createErr);
-        }
+// db.query("CREATE TABLE IF NOT EXISTS comments (comment_id INT PRIMARY KEY AUTO_INCREMENT, project_id INT,thesis_id INT,student_id INT, comment_text TEXT, timestamps TIMESTAMP, FOREIGN KEY (project_id) REFERENCES classTeam_project(project_id),FOREIGN KEY (thesis_id) REFERENCES thesis(thesis_id), FOREIGN KEY (student_id) REFERENCES students(student_id)))", (createErr) => {
+//         if (createErr) {
+//                 console.error('Error creating the table:', createErr);
+//         }
 
-});
+// });
 
 db.query("CREATE TABLE IF NOT EXISTS ratings(rating_id INT PRIMARY KEY AUTO_INCREMENT , project_id INT , student_id INT, liked TINYINT, Timestamp TIMESTAMP, FOREIGN KEY (project_id) REFERENCES classTeam_project(project_id),FOREIGN KEY (student_id) REFERENCES students(student_id))", (createErr) => {
         if (createErr) {
@@ -93,7 +93,7 @@ db.query("CREATE TABLE IF NOT EXISTS ratings(rating_id INT PRIMARY KEY AUTO_INCR
 
 });
 
-db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREMENT,student_id int , teacher_id int, role_id int,  FOREIGN KEY (role_id) REFERENCES roles(role_id),FOREIGN KEY (student_id) REFERENCES students(student_id),FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id))", (createErr) => {
+db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREMENT , student_id int , teacher_id int, role_id int,  FOREIGN KEY (role_id) REFERENCES roles(role_id),FOREIGN KEY (student_id) REFERENCES students(student_id),FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id))", (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
