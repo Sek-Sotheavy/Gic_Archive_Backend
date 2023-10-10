@@ -1,5 +1,7 @@
 const express = require('express');
 const multer = require('multer');
+const cookieParser = require('cookie-parser')
+
 const student = require('../studentControllers/auth');
 const studentList = require('../studentControllers/crudStudent');
 const teacher = require('../teacherControllers/auth');
@@ -39,19 +41,30 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// 
+//
+router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
-        // console.log(req.user.first_name);
-        return res.json({
-                status: "Success",
-                first_name: req.user.first_name,
-                last_name: req.user.last_name,
-                email: req.user.email,
-                name: req.user.name,
-                gender: req.user.gender,
-                generation: req.user.generation,
-                role_name: req.user.role_name
-        });
+        try {
+                console.log(req.user.id);
+                // console.log('Cookies:', req.cookies);
+                return res.json({
+                        status: "Success",
+                        id: req.user.id,
+                        first_name: req.user.first_name,
+                        last_name: req.user.last_name,
+                        email: req.user.email,
+                        name: req.user.name,
+                        gender: req.user.gender,
+                        generation: req.user.generation,
+                        role_name: req.user.role_name
+                });
+        } catch (error) {
+                console.error('Error:', error);
+                return res.status(500).json({
+                        status: 'Error',
+                        message: 'Internal server error'
+                });
+        }
 });
 router.post('/login', con.login, auth.ensureSignedOut, joiValidation(signInSchema));
 router.post('/admin/signup/teacher', upload.single('image'), teacher.signup);
@@ -115,7 +128,7 @@ router.get('/admin/project/:id', project.displayById);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
 
 router.post('/project/addMember/:id', member.addMember);
-router.get('/project/member',member.CountMember);
+router.get('/project/member', member.CountMember);
 
 //comment
 router.post('/comment/create', comment.create);
@@ -140,6 +153,6 @@ router.post('/upload/photo', upload.single('image'), photo.create);
 
 // student 
 router.get('/student/thesis/:id', thesis.displayThesis);
-router.get('/student/project', project.displayByid);
-router.get('/student/thesis', thesis.display);
+router.get('/student/project/:name', project.displayByName);
+router.get('/student/thesis/:name', thesis.display);
 module.exports = router;

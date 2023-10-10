@@ -41,18 +41,6 @@ const update = async (req, res) => {
                 res.status(500).json({ message: 'An error occurred' });
         }
 }
-// const remove = async (req, res) => {
-//         const id = req.params.id;
-//         db.query('DELETE FROM classTeam_project WHERE project_id = ?', [id], (err, results) => {
-//                 if (err) {
-//                         console.error('Error delete project:', err);
-//                 } else {
-//                         console.log('Team project delete successfully');
-//                         res.send('Team project delete successfully');
-//                         console.log(results);
-//                 }
-//         })
-// }
 const remove = async (req, res) => {
         const id = req.params.id;
 
@@ -96,7 +84,7 @@ const displayAll = async (req, res) => {
 }
 const displayById = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT cl.*, c.course_name, GROUP_CONCAT(s.username) AS student_names, d.fileName, d.filepath  FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id LEFT JOIN  classteamproject_member m ON m.project_id = cl.project_id LEFT JOIN  students s ON s.student_id = m.student_id WHERE cl.project_id = ? GROUP BY cl.project_id; ';
+        const selectQuery = 'SELECT cl.*, c.course_name, GROUP_CONCAT(s.username) AS student_names, t.username AS teacher_name,d.fileName, d.filepath  FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN documents d ON d.doc_id = cl.doc_id LEFT JOIN  classteamproject_member m ON m.project_id = cl.project_id LEFT JOIN  students s ON s.student_id = m.student_id WHERE cl.project_id = ? GROUP BY cl.project_id; ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -133,7 +121,26 @@ const getbyCourse = async (req, res) => {
 }
 const displayByid = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT cl.*, course_name, t.username AS teacher_name, s.username AS student_name, d.fileName,d.filepath FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN students s ON s.student_id = cl.project_id JOIN documents d ON d.doc_id = cl.doc_id WHERE s.student_id =1 ';
+        const selectQuery = 'SELECT cl.*, course_name, t.username AS teacher_name, s.username AS student_name, d.fileName,d.filepath FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN students s ON s.student_id = cl.project_id JOIN documents d ON d.doc_id = cl.doc_id WHERE s.student_id = ? ';
+
+        db.query(selectQuery, [id], (err, results) => {
+                if (err) {
+                        console.error('Error fetching team project:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const thesis = results[0];
+                                console.log('team_project:', thesis);
+                                res.send(results);
+                        } else {
+                                console.log('Team project not found');
+                        }
+                }
+        });
+}
+const displayByName = async (req, res) => {
+        const id = req.params.name;
+        const selectQuery = 'SELECT cl.*, s.username, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = ? ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -157,6 +164,7 @@ module.exports = {
         displayAll,
         displayById,
         getbyCourse,
-        displayByid
+        displayByid,
+        displayByName
 
 }

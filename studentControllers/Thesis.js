@@ -17,8 +17,7 @@ const displayThesis = async (req, res) => {
 
 const display = async (req, res) => {
 
-        const email = req.params.email;
-        db.query('SELECT t.*,s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id WHERE s.student_id = 1; ', (err, results) => {
+        db.query('SELECT t.*,s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id WHERE s.username = ? ', (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
