@@ -3,21 +3,31 @@ const moment = require('moment');
 
 const create = async (req, res) => {
 
-        const pdfMimeType = req.file.minetype;
-        const pdfFilePath = req.file.path;
-        const filename = req.file.originalname;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
         const { title, descr, course_name, github_url, username } = req.body;
+        const file = req.files['file'][0]; // Assuming 'file' is the field name
+        const image = req.files['image'][0]; // Assuming 'image' is the field name
+
+        // Access file properties
+        const fileMimetype = file.mimetype;
+        const filePath = file.path;
+        const filename = file.originalname;
+
+        // Access image properties
+        const imageName = image.originalname;
+        const imagePath = image.path;
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
         try {
                 await db.promise().query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
-                        [filename, pdfFilePath, pdfMimeType, date]
+                        [filename, fileMimetype, filePath, date]
                 )
                 await db.promise().query(
                         'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
-                        [title, course_name, descr, github_url, pdfFilePath])
+                        [title, course_name, descr, github_url, filePath])
 
-                res.json({ message: 'Create successfully' });
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id,project_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?),(SELECT project_id FROM classTeam_project where title =?))',
+                        [null, null, null, imageName, imagePath, null, title]);
+                res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -84,7 +94,7 @@ const displayAll = async (req, res) => {
 }
 const displayById = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT cl.*, c.course_name, GROUP_CONCAT(s.username) AS student_names, t.username AS teacher_name,d.fileName, d.filepath  FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN documents d ON d.doc_id = cl.doc_id LEFT JOIN  classteamproject_member m ON m.project_id = cl.project_id LEFT JOIN  students s ON s.student_id = m.student_id WHERE cl.project_id = ? GROUP BY cl.project_id; ';
+        const selectQuery = 'SELECT cl.*,p.filepath AS imagePath, c.course_name, GROUP_CONCAT(s.username) AS student_names, t.username AS teacher_name,d.fileName, d.filepath  FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN documents d ON d.doc_id = cl.doc_id LEFT JOIN  classteamproject_member m ON m.project_id = cl.project_id LEFT JOIN  students s ON s.student_id = m.student_id join photo p on p.project_id = cl.project_id WHERE cl.project_id = ? GROUP BY cl.project_id; ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {

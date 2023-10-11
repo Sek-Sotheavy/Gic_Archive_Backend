@@ -33,16 +33,18 @@ const create = async (req, res) => {
         const pdfMimeType = req.file.mimetype;
         const pdfFilePath = req.file.path;
         const filename = req.file.originalname;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
         try {
-                await db.promise().query(
+                db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
                         [filename, pdfFilePath, pdfMimeType, date]
                 );
-                await db.promise().query(
+                db.query(
                         'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
                         [title, username, teacher_name, descr, field, company, tags, github_url, pdfFilePath]);
-                res.json({ message: 'Create successfully' });
+                await db.promise().query('INSERT INTO image( teacher_id, student_id,course_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT thesis_id FROM courses where title =?), ?,?)',
+                        [null, null, null, title, filename, filepath]);
+                res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);

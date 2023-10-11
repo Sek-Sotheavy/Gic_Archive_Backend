@@ -1,10 +1,15 @@
+
 require("dotenv").config();
 const express = require("express")
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const app = express();
-const cors = require('cors')
 
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log('Listening on port 3001'));
+
+
+const cors = require('cors')
 const corsOptions = {
         origin: true,
         credentials: true,
@@ -33,5 +38,3 @@ app.use(express.json());
 // router 
 app.use('/', require('./routes'))
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log('Listening on port 3001'));

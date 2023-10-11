@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const cookieParser = require('cookie-parser')
-
+const db = require('../config/db');
 const student = require('../studentControllers/auth');
 const studentList = require('../studentControllers/crudStudent');
 const teacher = require('../teacherControllers/auth');
@@ -96,7 +96,40 @@ router.get('/like', (req, res) => {
         res.sendFile(__dirname + '/index.html');
 });
 //thesis
-router.post('/admin/thesis/create', upload.single('file'), thesis.create);
+// router.post('/admin/thesis/create', upload.single('file'), thesis.create);
+router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
+        const { title, username, descr, field, company, tags, github_url, teacher_name } = req.body;
+        const file = req.files['file'][0]; // Assuming 'file' is the field name
+        const image = req.files['image'][0]; // Assuming 'image' is the field name
+
+        // Access file properties
+        const fileMimetype = file.mimetype;
+        const filePath = file.path;
+        const filename = file.originalname;
+
+        // Access image properties
+        const imageName = image.originalname;
+        const imagePath = image.path;
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        try {
+                db.query(
+                        'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
+                        [filename, filePath, fileMimetype, date]
+                );
+                db.query(
+                        'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
+                        [title, username, teacher_name, descr, field, company, tags, github_url, filePath]);
+
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?))',
+                        [null, null, null, imageName, imagePath, title]);
+                res.json({ message: 'Thesis Create successfully' });
+        }
+        catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'An error occurred' });
+        }
+});
+
 router.get('/admin/thesis/all', thesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', thesis.SearchbyField);
@@ -119,9 +152,41 @@ router.post('/role/remove/:id', role.remove);
 router.post('/role/update/:id', role.update);
 
 //project
-// router.post('/project/create', upload.single('pdf'), project.create);
+router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
+
+        const { title, descr, course_name, github_url } = req.body;
+        const file = req.files['file'][0]; // Assuming 'file' is the field name
+        const image = req.files['image'][0]; // Assuming 'image' is the field name
+
+        // Access file properties
+        const fileMimetype = file.mimetype;
+        const filePath = file.path;
+        const filename = file.originalname;
+
+        // Access image properties
+        const imageName = image.originalname;
+        const imagePath = image.path;
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        try {
+                db.query(
+                        'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
+                        [filename, fileMimetype, filePath, date]
+                )
+                db.query(
+                        'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
+                        [title, course_name, descr, github_url, filePath])
+
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id,project_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?),(SELECT project_id FROM classTeam_project where title =?))',
+                        [null, null, null, imageName, imagePath, null, title]);
+                res.json({ message: 'Thesis Create successfully' });
+        }
+        catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'An error occurred' });
+        }
+})
 router.get('/admin/project/all', project.displayAll);
-router.post('/admin/project/create', upload.single('file'), project.create)
+// router.post('/admin/project/create', upload.single('file'), project.create)
 router.post('/admin/project/update', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayById);

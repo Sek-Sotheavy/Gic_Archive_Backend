@@ -25,7 +25,7 @@ db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_IN
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
-        
+
 });
 db.query('CREATE TABLE IF NOT EXISTS teachers(teacher_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT , gender VARCHAR(255), FOREIGN KEY (role_id) REFERENCES roles(role_id) ) ', (createErr) => {
         if (createErr) {
@@ -98,6 +98,11 @@ db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREME
                 console.error('Error creating the table:', createErr);
         }
 });
+db.query("CREATE TABLE IF NOT EXISTS Image(photo_id INT PRIMARY KEY AUTO_INCREMENT, teacher_id INT , student_id INT , course_id INT, thesis_id INT  , file_name VARCHAR(255), filepath VARCHAR(255), FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),FOREIGN KEY (student_id) REFERENCES students(student_id), FOREIGN KEY (course_id) REFERENCES courses(course_id),FOREIGN KEY (thesis_id) REFERENCES thesis(thesis_id))", (createErr) => {
+        if (createErr) {
+                console.error('Error creating the table:', createErr);
+        }
 
+});
 
 module.exports = db;
