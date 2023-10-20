@@ -13,15 +13,15 @@ const signup = async (req, res) => {
         db.query(
             'INSERT INTO teachers (username, first_name, last_name, email, password, role_id, gender) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [username, first_name, last_name, email, hashedPassword, 1, gender]
-        );
+        )
         db.query(
             'INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?  LIMIT 1), ?,(SELECT course_id FROM courses where course_name =?), ?,?)',
             [username, null, null, filename, filepath]
-        );
+        )
         db.query(
             'INSERT INTO users (student_id, teacher_id ,rold_id) VALUES ((SELECT  student_id From students WHERE email = ?), (SELECT teacher_id From teachers WHERE username = ?),?)',
             [null, username, 1]
-        );
+        )
         res.json({ message: 'Teacher registered successfully' });
     }
     catch (error) {

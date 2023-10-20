@@ -65,7 +65,7 @@ exports.login = async function login(req, res) {
                                 })
                         } else {
                                 if (role === "student") {
-                                        db.query('SELECT s.*, r.role_name FROM users u JOIN students s ON s.student_id = u.student_id JOIN roles r ON s.role_id= r.role_id  WHERE  s.email = ? ', email, (error, results) => {
+                                        db.query('SELECT s.*, r.role_name, filepath FROM users u JOIN students s ON s.student_id = u.student_id JOIN roles r ON s.role_id= r.role_id JOIN photo p ON p.student_id = s.student_id  WHERE  s.email = ? ', email, (error, results) => {
                                                 if (error) {
                                                         res.json({
                                                                 status: false,
@@ -82,7 +82,8 @@ exports.login = async function login(req, res) {
                                                                         const email = results[0].email;
                                                                         const generation = results[0].generation;
                                                                         const role_name = results[0].role_name;
-                                                                        const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name }, 't0kenEncrypti0n');
+                                                                        const filepath = results[0].filepath;
+                                                                        const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name, filepath }, 't0kenEncrypti0n');
                                                                         res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
                                                                         console.log(id);

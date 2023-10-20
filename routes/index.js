@@ -45,7 +45,7 @@ const upload = multer({ storage: storage });
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                console.log(req.user.id);
+                console.log(req.user.filePath);
                 // console.log('Cookies:', req.cookies);
                 return res.json({
                         status: "Success",
@@ -56,7 +56,8 @@ router.get('/me', auth.checkUserLoggedIn, (req, res) => {
                         name: req.user.name,
                         gender: req.user.gender,
                         generation: req.user.generation,
-                        role_name: req.user.role_name
+                        role_name: req.user.role_name,
+                        filepath: req.user.filepath
                 });
         } catch (error) {
                 console.error('Error:', error);
@@ -130,11 +131,10 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
         }
 });
 
-router.get('/admin/thesis/all', thesis.displayThesis);
+router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
-router.post('/admin/thesis/all/field', thesis.SearchbyField);
-router.post('/admin/thesis/all/generation')
-router.post('/admin/thesis/delete/:id', thesis.remove);
+router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
+router.post('/admin/thesis/delete/:id', adminThesis.remove);
 
 //course
 router.get('/course/all', course.displayAll);
@@ -155,9 +155,8 @@ router.post('/role/update/:id', role.update);
 router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
 
         const { title, descr, course_name, github_url } = req.body;
-        const file = req.files['file'][0]; // Assuming 'file' is the field name
-        const image = req.files['image'][0]; // Assuming 'image' is the field name
-
+        const file = req.files['file'][0];
+        const image = req.files['image'][0];
         // Access file properties
         const fileMimetype = file.mimetype;
         const filePath = file.path;
@@ -206,18 +205,19 @@ router.get('/comment/all', comment.displayAll);
 router.post('/like', rating.create);
 router.get('/like/:id', rating.getbyId);
 
-// addmin dashboard
+// admin dashboard
 router.get('/getCourseCount', dashboard.getCountCourse);
 router.get('/getTeacherCount', dashboard.getCountTeacher);
 router.get('/getstudentCount', dashboard.getCountStudent);
 router.get('/getFemaleCount', dashboard.getFemale);
 router.get('/getMaleCount', dashboard.getMale);
-
+router.get('/getThesisCount', dashboard.getCountThesis);
+router.get('/getProjectCount', dashboard.getCountProject);
 // photo
 router.post('/upload/photo', upload.single('image'), photo.create);
 
 // student 
-router.get('/student/thesis/:id', thesis.displayThesis);
+router.get('/student/thesis/:name', thesis.displayThesis);
 router.get('/student/project/:name', project.displayByName);
-router.get('/student/thesis/:name', thesis.display);
+// router.get('/student/thesis/:name', thesis.display);
 module.exports = router;

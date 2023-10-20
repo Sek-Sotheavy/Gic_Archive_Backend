@@ -150,7 +150,7 @@ const displayByid = async (req, res) => {
 }
 const displayByName = async (req, res) => {
         const id = req.params.name;
-        const selectQuery = 'SELECT cl.*, s.username, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = ? ';
+        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ? ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {

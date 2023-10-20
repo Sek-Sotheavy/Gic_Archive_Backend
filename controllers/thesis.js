@@ -15,19 +15,19 @@ const displayThesis = async (req, res) => {
         });
 }
 
-const display = async (req, res) => {
+// const display = async (req, res) => {
 
-        const email = req.params.email;
-        db.query('SELECT t.*, s.username FROM thesis t JOIN students s WHERE t.student_id = s.student_id AND s.email = ?', email, (err, results) => {
-                if (err) {
-                        console.error('Error fetching student:', err);
-                }
-                else {
-                        res.send(results);
-                }
-                console.log(results);
-        });
-}
+//         const email = req.params.email;
+//         db.query('SELECT t.*, s.username FROM thesis t JOIN students s WHERE t.student_id = s.student_id AND s.email = ?', email, (err, results) => {
+//                 if (err) {
+//                         console.error('Error fetching student:', err);
+//                 }
+//                 else {
+//                         res.send(results);
+//                 }
+//                 console.log(results);
+//         });
+// }
 const create = async (req, res) => {
 
         const { title, username, descr, field, company, tags, github_url, teacher_name } = req.body;
@@ -108,5 +108,5 @@ module.exports = {
         displayById,
         SearchbyField,
         remove,
-        display
+        // display
 }
