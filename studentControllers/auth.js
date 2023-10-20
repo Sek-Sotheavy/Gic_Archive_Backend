@@ -4,17 +4,17 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = 'secret';
 
-// const getUserByEmail = async (email, password, role_name) => {
-//     const query = 'SELECT s.* FROM users u join students s  WHERE s.student_id = u.student_id  AND s.email = ? AND s.password =? ';
-//     const results = await db.promise().query(query, [email, password]);
-//     return results[0];
-// }
+const getUserByEmail = async (email) => {
+    const query = 'SELECT * students  WHERE email = ?  ';
+    const results = await db.promise().query(query, [email]);
+    return results[0];
+}
 
 const signup = async (req, res) => {
 
     const filename = req.file.originalname;
     const filepath = req.file.path;
-    const { username, email, gender, password, first_name, last_name, generation, role_name } = req.body;
+    const { username, email, gender, password, first_name, last_name, generation } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         // const emailExists = await getUserByEmail(email);

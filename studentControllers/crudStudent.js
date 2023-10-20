@@ -34,6 +34,25 @@ const getbyId = async (req, res) => {
                 }
         })
 }
+const getStudent = async (req, res) => {
+        // const id = req.params.id;
+        const email = req.body.email;
+        const sql = 'SELECT * FROM students WHERE email = ?';
+        db.query(sql, [email], (err, results) => {
+                if (err) {
+                        console.error('Error fetching student:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const student = results[0];
+                                console.log('Student:', student);
+                                res.send(results);
+                        } else {
+                                console.log('Student not found');
+                        }
+                }
+        })
+}
 const getbyName = async (req, res) => {
         const name = req.body.name;
         const query = "Select * from students where fullname like '%?%' ";
@@ -72,8 +91,8 @@ const getbyGeneration = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const { fullname, gender, address, email, phone } = req.body;
-        db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ', [fullname, gender, address, email, phone, id], (err, results) => {
+        const { username,first_name, last_name,email, password, gender,generation } = req.body;
+        db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ', [username,first_name, last_name,email, password, gender,generation , id], (err, results) => {
                 if (err) {
                         console.error('Error updating student:', err);
                 } else {
@@ -87,15 +106,29 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
         const id = req.params.id;
-        db.query('DELETE FROM students WHERE  student_id = ?', [id], (err, results) => {
-                if (err) {
-                        console.error('Error updating student:', err);
-                } else {
-                        console.log('Student delete successfully');
+    
+        db.query('SET FOREIGN_KEY_CHECKS=0;', (err) => {
+            if (err) {
+                console.error('Error disabling foreign key checks:', err);
+            } else {
+                db.query('DELETE FROM `students` WHERE `student_id` = ? LIMIT 10 ;', [id], (err, results) => {
+                    if (err) {
+                        console.error('Error deleting student:', err);
+                    } else {
+                        console.log('Student deleted successfully');
+                        res.status(200).send('Student deleted successfully!');
                         console.log(results);
-                }
-        })
-}
+                    }
+                    db.query('SET FOREIGN_KEY_CHECKS=1;', (err) => {
+                        if (err) {
+                            console.error('Error enabling foreign key checks:', err);
+                        }
+                    });
+                });
+            }
+        });
+    };
+    
 
 module.exports = {
         displayAll,
@@ -104,5 +137,6 @@ module.exports = {
         getbyGeneration,
         update,
         remove,
-     
+        getStudent
+
 }

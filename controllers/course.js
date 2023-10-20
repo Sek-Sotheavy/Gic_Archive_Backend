@@ -30,7 +30,6 @@ const create = async (req, res) => {
                                 } else {
                                         console.log('PDF file data inserted successfully');
                                         // res.status(200).send('course uploaded and saved');
-
                                         console.log(results);
                                 }
                         });
@@ -41,17 +40,16 @@ const create = async (req, res) => {
         }
 }
 const update = async (req, res) => {
-        // const id = req.body.id;
-        // const course_name = req.body.id;
-        const { courseName, teacher_name, } = req.body;
+        const id = req.params.id;
+        const { course_name, teacher_name } = req.body;
 
         try {
                 const result = await db.promise().query(
-                        'UPDATE courses SET course_name =? , teacher_id where course_id =?',
-                        [courseName, teacher_name, id]
+                        'UPDATE courses SET course_name = ?, teacher_id = (SELECT teacher_id FROM teachers WHERE username = ?) WHERE course_id = ?;',
+                        [course_name, teacher_name, id]
                 );
                 console.log(result);
-                res.json({ message: 'Update successfully' });
+                res.json({ message: 'Course Update successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -60,16 +58,28 @@ const update = async (req, res) => {
 }
 const remove = async (req, res) => {
         const id = req.params.id;
-        db.query('DELETE FROM courses WHERE  course_id = ?', [id], (err, results) => {
-                if (err) {
-                        console.error('Error updating courser:', err);
-                } else {
-                        res.send('Delete successfully');
-                        console.log('Delete successfully');
+    
+        db.query('SET FOREIGN_KEY_CHECKS=0;', (err) => {
+            if (err) {
+                console.error('Error disabling foreign key checks:', err);
+            } else {
+                db.query('DELETE FROM `courses` WHERE `course_id` = ? LIMIT 10 ;', [id], (err, results) => {
+                    if (err) {
+                        console.error('Error deleting student:', err);
+                    } else {
+                        console.log('Course deleted successfully');
+                        res.status(200).send('Course deleted successfully!');
                         console.log(results);
-                }
-        })
-}
+                    }
+                    db.query('SET FOREIGN_KEY_CHECKS=1;', (err) => {
+                        if (err) {
+                            console.error('Error enabling foreign key checks:', err);
+                        }
+                    });
+                });
+            }
+        });
+    };
 const displayAll = async (req, res) => {
 
         const sqlQuery = 'SELECT c.*, t.username FROM courses c JOIN teachers t WHERE c.teacher_id = t.teacher_id;';

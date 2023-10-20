@@ -3,29 +3,29 @@ const moment = require('moment');
 const { validationResult } = require('express-validator');
 
 const create = async (req, res) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { comment_id, project_id, thesis_id,student_id, comment_text } = req.body;
-  
-  try {
-
-        const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
-    const result = await db.promise().query(
-      'INSERT INTO comments (comment_id, project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?,(SELECT  project_id From classTeam_project WHERE project_id = ?), (SELECT  thesis_id From thesis WHERE thesis_id = ?),?,?,?)',
-      [comment_id, project_id,thesis_id, student_id, comment_text, timestamp]
-    );
-
-    console.log(result);
-    res.json({ message: 'Comment created successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'An error occurred while creating the comment' });
-  }
-};
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
+      
+        const { comment_id, project_id, thesis_id, comment_text } = req.body;
+        const userId = req.params.user_id; 
+        try {
+     
+      
+          const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
+          const result = await db.promise().query(
+            'INSERT INTO comments (project_id, thesis_id, student_id, comment_text, timestamp) VALUES ((SELECT  project_id From classTeam_project WHERE project_id = ?), (SELECT  thesis_id From thesis WHERE thesis_id = ?),?,?,?)',
+            [null, userId, userId, comment_text, timestamp]
+          );
+      
+          console.log(result);
+          res.json({ message: 'Comment created successfully' });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'An error occurred while creating the comment' });
+        }
+      };
 
 const update = async (req, res) => {
     const id = req.params.id;
