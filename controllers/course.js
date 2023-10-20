@@ -12,10 +12,10 @@ const create = async (req, res) => {
         try {
                 db.query(query, [course_name, username], (Err, result) => {
                         if (Err) {
-                                console.error('Error inserting PDF file data:', Err);
+                                console.error('Error inserting course:', Err);
                                 // res.status(500).send('Internal Server Error');
                         } else {
-                                console.log('PDF file data inserted successfully');
+                                console.log('course successfully');
                                 // res.status(200).send('course uploaded and saved');
                                 console.log(result);
                         }
@@ -23,14 +23,14 @@ const create = async (req, res) => {
                 db.query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
                         [null, null, course_name, filename, filepath], (insertErr, results) => {
                                 if (insertErr) {
-                                        console.error('Error inserting PDF file data:', insertErr);
+                                        console.error('Error inserting photo data:', insertErr);
                                         // res.status(500).send('Internal Server Error');
                                 } else {
-                                        console.log('PDF file data inserted successfully');
+                                        console.log('photo inserted successfully');
                                         // res.status(200).send('course uploaded and saved');
                                         console.log(results);
                                 }
-                        });
+                        })
         }
         catch (error) {
                 console.error(error);
@@ -38,8 +38,6 @@ const create = async (req, res) => {
         }
 }
 const update = async (req, res) => {
-        // const id = req.body.id;
-        // const course_name = req.body.id;
         const { courseName, teacher_name, } = req.body;
 
         try {
