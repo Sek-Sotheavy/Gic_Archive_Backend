@@ -53,7 +53,7 @@ const getCountCourse = async (req, res) => {
         })
 }
 const getFemale = async (req, res) => {
-        const query = 'SELECT COUNT(*) as girl FROM students WHERE gender = "female"OR gender = "F"';
+        const query = 'SELECT COUNT(*) as girl FROM students WHERE gender = "female" OR gender = "F"';
         db.query(query, (err, results) => {
                 if (err) {
                         console.error('Error fetching gender:', err);
@@ -86,11 +86,46 @@ const getMale = async (req, res) => {
                 }
         })
 }
-
+const getCountThesis = async (req, res) => {
+        const query = 'SELECT COUNT(*) as ThesisCount FROM thesis;';
+        db.query(query, (err, results) => {
+                if (err) {
+                        console.error('Error fetching gender:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const thesis = results[0].ThesisCount;
+                                console.log('Thesis Count:', thesis);
+                                res.send(results);
+                        } else {
+                                console.log('Thesis not found');
+                        }
+                }
+        })
+}
+const getCountProject = async (req, res) => {
+        const query = 'SELECT COUNT(*) as ProjectCount FROM classTeam_project;';
+        db.query(query, (err, results) => {
+                if (err) {
+                        console.error('Error fetching project:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const thesis = results[0].ProjectCount;
+                                console.log('Project Count:', thesis);
+                                res.send(results);
+                        } else {
+                                console.log('Project not found');
+                        }
+                }
+        })
+}
 module.exports = {
         getCountCourse,
         getCountStudent,
         getCountTeacher,
         getFemale,
-        getMale
+        getMale,
+        getCountThesis,
+        getCountProject
 }

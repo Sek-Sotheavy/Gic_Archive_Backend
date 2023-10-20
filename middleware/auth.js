@@ -2,9 +2,14 @@ const jwt = require('jsonwebtoken');
 const secretKey = 't0kenEncrypti0n';
 
 const checkUserLoggedIn = (req, res, next) => {
-
         try {
+
                 const token = req.headers['authorization'];
+
+                const tokens = req.cookies.access_token;
+                // console.log("cookie:", tokens);
+                // console.log('Token from cookie:', token);
+                // const token = req.cookies;
                 if (!token) {
                         return res.json({ Message: "We need token please provide it." })
                 }
@@ -15,7 +20,7 @@ const checkUserLoggedIn = (req, res, next) => {
                                 }
                                 else {
                                         req.user = decoded;
-                                        req.id = decoded.id;
+                                        req.id = decoded.id
                                         req.email = decoded.email
                                         req.name = decoded.name
                                         req.gender = decoded.gender
@@ -23,9 +28,10 @@ const checkUserLoggedIn = (req, res, next) => {
                                         req.last_name = decoded.last_name
                                         req.generation = decoded.generation
                                         req.role_name = decoded.role_name
-                                        console.log(req.user);
-                                        console.log(req.id);
-                                        console.log(req.first_name)
+                                        req.filepath = decoded.filepath
+                                        // console.log(req.user);
+                                        console.log(req.filepath);
+                                        // console.log(req.first_name)
                                         next();
                                 }
                         })
