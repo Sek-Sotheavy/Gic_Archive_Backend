@@ -198,15 +198,18 @@ router.post('/project/addMember/:id', member.addMember);
 router.get('/project/member', member.CountMember);
 
 //comment
-router.post("/comment/create", comment.create);
-router.post("/comment/update/:id", comment.update);
-router.post("/comment/delete/:id", comment.remove);
-router.get("/comment/:id", comment.getbyId);
-router.get("/comment/all", comment.displayAll);
+router.post('/comment/create', comment.create);
+router.post('/comment/update/:id', comment.update);
+router.post('/comment/delete/:comment_id', comment.remove);
+router.get('/comment/:id', comment.getbyId);
+router.get('/comment/thesis/:thesisid', comment.getbytheisId);
+router.get('/comment/all', comment.displayAll);
 
 //rating
-router.post("/like", rating.create);
-router.get("/like/:id", rating.getbyId);
+router.post('/like', rating.create);
+router.get('/countlike/:id', rating.getLike);//use for project
+router.get('/thesisliked/:id', rating.getthesisLike);//use for thesis
+router.get('/like/:id', rating.getbyId);
 
 // admin dashboard
 router.get('/getCourseCount', dashboard.getCountCourse);
