@@ -11,8 +11,8 @@ const DisplayAll = async (req, res) => {
                 }
                 else {
                         res.send(results);
+                        // console.log(results);
                 }
-                console.log(results);
         });
 }
 const getById = async (req, res) => {
@@ -100,6 +100,6 @@ module.exports = {
         remove,
         getById,
         getByName,
-        
+
 
 }  
