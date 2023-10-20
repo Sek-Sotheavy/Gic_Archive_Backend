@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = 'secret';
 
-const getUserByEmail = async (email, password, role_name) => {
-    const query = 'SELECT s.* FROM users u join students s  WHERE s.student_id = u.student_id  AND s.email = ? AND s.password =? ';
-    const results = await db.promise().query(query, [email, password]);
+const getUserByEmail = async (email) => {
+    const query = 'SELECT * students  WHERE email = ?  ';
+    const results = await db.promise().query(query, [email]);
     return results[0];
 }
 
