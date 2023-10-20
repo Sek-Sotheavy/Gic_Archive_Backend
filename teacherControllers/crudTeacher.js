@@ -2,18 +2,20 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 const DisplayAll = async (req, res) => {
-  const sqlQuery = "SELECT * FROM teachers";
 
-  db.query(sqlQuery, (error, results) => {
-    if (error) {
-      console.error("Error executing query:", error);
-      return;
-    } else {
-      res.send(results);
-    }
-    console.log(results);
-  });
-};
+        const sqlQuery = 'SELECT * FROM teachers ';
+
+        db.query(sqlQuery, (error, results) => {
+                if (error) {
+                        console.error('Error executing query:', error);
+                        return;
+                }
+                else {
+                        res.send(results);
+                }
+                console.log(results);
+        });
+}
 const getById = async (req, res) => {
   const id = req.params.id;
   const selectQuery = "SELECT * FROM teachers  WHERE teacher_id= ?";

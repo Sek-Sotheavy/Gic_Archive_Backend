@@ -10,11 +10,9 @@ const create = async (req, res) => {
         const query = 'INSERT INTO courses (course_name, teacher_id) VALUES (?, (SELECT teacher_id FROM teachers WHERE username = ?))';
 
         try {
-
-
                 db.query(query, [course_name, username], (Err, result) => {
                         if (Err) {
-                                console.error('Error inserting PDF file data:', insertErr);
+                                console.error('Error inserting PDF file data:', Err);
                                 // res.status(500).send('Internal Server Error');
                         } else {
                                 console.log('PDF file data inserted successfully');
@@ -140,7 +138,7 @@ module.exports = {
         update,
         getbyId,
         getbyCourse,
-        
+
 }
 
 

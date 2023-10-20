@@ -11,7 +11,7 @@ exports.logout = async function logout(req, res) {
                 .cookie("access_token", "", {
                         expire: now,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === "production",
+                        // secure: process.env.NODE_ENV === "production",
                 })
                 .json({
                         message: "Admin login successfully!",
@@ -65,7 +65,7 @@ exports.login = async function login(req, res) {
                                 })
                         } else {
                                 if (role === "student") {
-                                        db.query('SELECT s.*, r.role_name FROM users u JOIN students s ON s.student_id = u.student_id JOIN roles r ON s.role_id= r.role_id  WHERE  s.email = ? ', email, (error, results) => {
+                                        db.query('SELECT s.*, r.role_name, filepath FROM users u JOIN students s ON s.student_id = u.student_id JOIN roles r ON s.role_id= r.role_id JOIN photo p ON p.student_id = s.student_id  WHERE  s.email = ? ', email, (error, results) => {
                                                 if (error) {
                                                         res.json({
                                                                 status: false,
@@ -74,6 +74,7 @@ exports.login = async function login(req, res) {
                                                 } else {
                                                         if (results.length > 0) {
                                                                 if (isValidPassword) {
+                                                                        const id = results[0].student_id;
                                                                         const first_name = results[0].first_name;
                                                                         const last_name = results[0].last_name;
                                                                         const name = results[0].username;
@@ -81,10 +82,11 @@ exports.login = async function login(req, res) {
                                                                         const email = results[0].email;
                                                                         const generation = results[0].generation;
                                                                         const role_name = results[0].role_name;
-                                                                        const token = jwt.sign({ first_name, last_name, email, name, gender, generation, role_name }, 't0kenEncrypti0n');
-                                                                        res.cookie('token', token) 
+                                                                        const filepath = results[0].filepath;
+                                                                        const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name, filepath }, 't0kenEncrypti0n');
+                                                                        res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
-
+                                                                        console.log(id);
                                                                         return res.json({
                                                                                 status: true,
                                                                                 data: results,
@@ -107,15 +109,44 @@ exports.login = async function login(req, res) {
                                                         })
                                                 } else {
                                                         if (results.length > 0) {
+                                                                // if (isValidPassword) {
+                                                                //         const first_name = results[0].first_name;
+                                                                //         const last_name = results[0].last_name;
+                                                                //         const name = results[0].username;
+                                                                //         const gender = results[0].gender;
+                                                                //         const email = results[0].email;
+                                                                //         const role_name = results[0].role_name;
+                                                                //         const token = jwt.sign({ first_name, last_name, email, name, gender, role_name }, 't0kenEncrypti0n');
+                                                                //         res.cookie('token', token);
+                                                                //         document.cookie;
+                                                                //         return res.json({
+                                                                //                 status: true,
+                                                                //                 data: results,
+                                                                //                 token,
+                                                                //                 message: 'Successfully authenticated'
+                                                                //         });
+
+                                                                // }
                                                                 if (isValidPassword) {
-                                                                        const first_name = results[0].first_name;
-                                                                        const last_name = results[0].last_name;
-                                                                        const name = results[0].username;
-                                                                        const gender = results[0].gender;
-                                                                        const email = results[0].email;
-                                                                        const role_name = results[0].role_name;
-                                                                        const token = jwt.sign({ first_name, last_name, email, name, gender, role_name }, 't0kenEncrypti0n');
-                                                                        res.cookie('token', token);
+                                                                        const {
+                                                                                first_name,
+                                                                                last_name,
+                                                                                username,
+                                                                                gender,
+                                                                                email,
+                                                                                role_name
+                                                                        } = results[0];
+
+                                                                        const token = jwt.sign({
+                                                                                first_name,
+                                                                                last_name,
+                                                                                email,
+                                                                                username,
+                                                                                gender,
+                                                                                role_name
+                                                                        }, 't0kenEncrypti0n');
+                                                                        console.log('Token set in cookie:', token);
+                                                                        res.cookie('token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
 
                                                                         return res.json({
@@ -124,7 +155,6 @@ exports.login = async function login(req, res) {
                                                                                 token,
                                                                                 message: 'Successfully authenticated'
                                                                         });
-
                                                                 }
                                                         }
                                                 }

@@ -7,7 +7,6 @@ const displayAll = async (req, res) => {
         db.query(sqlQuery, (error, results) => {
                 if (error) {
                         console.error('Error executing query:', error);
-                        return;
                 }
                 else {
                         res.send(results);
