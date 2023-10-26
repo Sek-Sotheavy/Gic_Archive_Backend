@@ -46,8 +46,9 @@ router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
                 console.log(req.user.filePath);
-                // console.log('Cookies:', req.cookies);
-                return res.json({
+                // res.send(req.cookies);
+                // console.log('Cookies:',  req.cookies);
+                return res.status(200).json({
                         status: "Success",
                         id: req.user.id,
                         first_name: req.user.first_name,
@@ -97,7 +98,7 @@ router.get('/like', (req, res) => {
         res.sendFile(__dirname + '/index.html');
 });
 //thesis
-// router.post('/admin/thesis/create', upload.single('file'), thesis.create);
+
 router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
         const { title, username, descr, field, company, tags, github_url, teacher_name } = req.body;
         const file = req.files['file'][0]; // Assuming 'file' is the field name
@@ -121,9 +122,9 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
                         'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
                         [title, username, teacher_name, descr, field, company, tags, github_url, filePath]);
 
-                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?))',
-                        [null, null, null, imageName, imagePath, title]);
-                res.json({ message: 'Thesis Create successfully' });
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
+                        [null, null, null, null, title, imageName, imagePath]);
+                // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -152,11 +153,12 @@ router.post('/role/remove/:id', role.remove);
 router.post('/role/update/:id', role.update);
 
 //project
-router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
 
+router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
         const { title, descr, course_name, github_url } = req.body;
-        const file = req.files['file'][0];
-        const image = req.files['image'][0];
+        const file = req.files['file'][0]; // Assuming 'file' is the field name
+        const image = req.files['image'][0]; // Assuming 'image' is the field name
+
         // Access file properties
         const fileMimetype = file.mimetype;
         const filePath = file.path;
@@ -169,21 +171,22 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
-                        [filename, fileMimetype, filePath, date]
-                )
+                        [filename, filePath, fileMimetype, date]
+                );
                 db.query(
                         'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
                         [title, course_name, descr, github_url, filePath])
 
-                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id,project_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?),(SELECT project_id FROM classTeam_project where title =?))',
-                        [null, null, null, imageName, imagePath, null, title]);
-                res.json({ message: 'Thesis Create successfully' });
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
+                        [null, null, null, title, null, imageName, imagePath]);
+                // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'An error occurred' });
         }
-})
+});
+
 router.get('/admin/project/all', project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
 router.post('/admin/project/update', project.update);
@@ -220,7 +223,7 @@ router.get('/getProjectCount', dashboard.getCountProject);
 router.post('/upload/photo', upload.single('image'), photo.create);
 
 // student 
-router.get('/student/thesis/:name', thesis.displayThesis);
+router.get('/student/thesis/:name', thesis.display);
 router.get('/student/project/:name', project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
 module.exports = router;

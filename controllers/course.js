@@ -23,11 +23,9 @@ const create = async (req, res) => {
                 db.query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
                         [null, null, course_name, filename, filepath], (insertErr, results) => {
                                 if (insertErr) {
-                                        console.error('Error inserting photo data:', insertErr);
-                                        // res.status(500).send('Internal Server Error');
+                                        console.error('Error inserting photo data:', insertErr);                  
                                 } else {
                                         console.log('photo inserted successfully');
-                                        // res.status(200).send('course uploaded and saved');
                                         console.log(results);
                                 }
                         })

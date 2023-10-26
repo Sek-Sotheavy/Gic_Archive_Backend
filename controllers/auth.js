@@ -86,6 +86,7 @@ exports.login = async function login(req, res) {
                                                                         const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name, filepath }, 't0kenEncrypti0n');
                                                                         res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
+                                                                        // res.send('access_token',token);
                                                                         console.log(id);
                                                                         return res.json({
                                                                                 status: true,

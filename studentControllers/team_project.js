@@ -94,7 +94,7 @@ const displayAll = async (req, res) => {
 }
 const displayById = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT cl.*,p.filepath AS imagePath, c.course_name, GROUP_CONCAT(s.username) AS student_names, t.username AS teacher_name,d.fileName, d.filepath  FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN documents d ON d.doc_id = cl.doc_id LEFT JOIN  classteamproject_member m ON m.project_id = cl.project_id LEFT JOIN  students s ON s.student_id = m.student_id join photo p on p.project_id = cl.project_id WHERE cl.project_id = ? GROUP BY cl.project_id; ';
+        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id WHERE cl.project_id = ?  GROUP BY cl.project_id; ';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -150,7 +150,8 @@ const displayByid = async (req, res) => {
 }
 const displayByName = async (req, res) => {
         const id = req.params.name;
-        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ? ';
+        // const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ? ';
+        const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = ?;'
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
