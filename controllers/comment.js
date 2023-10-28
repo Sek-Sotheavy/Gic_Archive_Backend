@@ -8,7 +8,7 @@ const create = async (req, res) => {
           return res.status(400).json({ errors: errors.array() });
         }
       
-        const { project_id, thesis_id, comment_text, student_id } = req.body;
+        const { project_id, thesis_id, comment_text, student_id  } = req.body;
       
         try {
           const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
@@ -70,9 +70,9 @@ const displayAll = async (req, res) => {
         //   console.log(results);
   });
 }
-const getbyId = async (req, res) => {
+const getbyprojectId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT * FROM comments WHERE project_id = ?';
+        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.project_id = ?;';
       
         db.query(selectQuery, [id], (err, results) => {
           if (err) {
@@ -90,10 +90,11 @@ const getbyId = async (req, res) => {
         });
 };
 
-const getbytheisId = async (req, res) => {
+const getbythesisId = async (req, res) => {
         const thesisid = req.params.thesisid;
-        const selectQuery = 'SELECT c.*, username FROM comments c JOIN students s ON s.student_id = c.student_id WHERE s.student_id = ?';
-      
+        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?;';
+        // SELECT c.*, username FROM comments c JOIN students s ON c.student_id = s.student_id WHERE s.student_id = ?
+        // SELECT * FROM comments WHERE thesis_id = ?
         db.query(selectQuery, [thesisid], (err, results) => {
           if (err) {
             console.error('Error fetching comments:', err);
@@ -114,6 +115,6 @@ module.exports = {
     update,
     remove,
     displayAll,
-    getbyId,
-    getbytheisId
+    getbyprojectId,
+    getbythesisId
 }

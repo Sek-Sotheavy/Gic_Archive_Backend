@@ -190,7 +190,7 @@ router.get('/admin/project/all', project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
 router.post('/admin/project/update', project.update);
 router.post('/admin/project/delete/:id', project.remove);
-router.get('/admin/project/:id', project.displayById);
+router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
 
 router.post('/project/addMember/:id', member.addMember);
@@ -200,8 +200,8 @@ router.get('/project/member', member.CountMember);
 router.post('/comment/create', comment.create);
 router.post('/comment/update/:id', comment.update);
 router.post('/comment/delete/:comment_id', comment.remove);
-router.get('/comment/:id', comment.getbyId);
-router.get('/comment/thesis/:thesisid', comment.getbytheisId);
+router.get('/comment/project/:id', comment.getbyprojectId);
+router.get('/comment/thesis/:thesisid', comment.getbythesisId);
 router.get('/comment/all', comment.displayAll);
 
 //rating
