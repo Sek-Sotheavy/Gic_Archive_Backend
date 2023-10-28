@@ -23,11 +23,9 @@ const signup = async (req, res) => {
                     console.log(results);
                 }
             })
-        db.query(
-            'INSERT INTO users (student_id, teacher_id ,rold_id) VALUES ((SELECT  student_id From students WHERE email = ?), (SELECT teacher_id From teachers WHERE username = ?),?)',
-            [null, username, 1]
-        )
-        res.json({ message: 'Teacher registered successfully' });
+        const sql = 'INSERT INTO users (student_id, teacher_id , role_id) VALUES (?,(SELECT teacher_id from teachers where username =?),  ?)';
+        db.query(sql, [null, username, 1])
+        // res.json({ message: 'Teacher registered successfully' });
     }
     catch (error) {
         console.error(error);

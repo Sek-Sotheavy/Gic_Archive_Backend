@@ -38,14 +38,13 @@ const storage = multer.diskStorage({
                 cb(null, file.originalname)
         }
 })
-
 const upload = multer({ storage: storage });
 
 //
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                console.log(req.user.filePath);
+                console.log(req.user.id);
                 // res.send(req.cookies);
                 // console.log('Cookies:',  req.cookies);
                 return res.status(200).json({

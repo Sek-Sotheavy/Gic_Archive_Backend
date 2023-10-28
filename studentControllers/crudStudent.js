@@ -9,6 +9,7 @@ const displayAll = async (req, res) => {
                         console.error('Error executing query:', error);
                 }
                 else {
+                        // console.log(results);
                         res.send(results);
                 }
                 console.log(results);
@@ -92,15 +93,15 @@ const update = async (req, res) => {
         const id = req.params.id;
         const { fullname, gender, address, email, phone } = req.body;
         db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ',
-         [fullname, gender, address, email, phone, id], (err, results) => {
-                if (err) {
-                        console.error('Error updating student:', err);
-                } else {
-                        console.log('Student updated successfully');
-                        res.send('Student updated successfully')
-                        console.log(results);
-                }
-        })
+                [fullname, gender, address, email, phone, id], (err, results) => {
+                        if (err) {
+                                console.error('Error updating student:', err);
+                        } else {
+                                console.log('Student updated successfully');
+                                res.send('Student updated successfully')
+                                console.log(results);
+                        }
+                })
 
 }
 
