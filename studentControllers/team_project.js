@@ -3,7 +3,7 @@ const moment = require('moment');
 
 const create = async (req, res) => {
 
-        const { title, descr, course_name, github_url, username } = req.body;
+        const { title, descr, course_name, github_url } = req.body;
         const file = req.files['file'][0]; // Assuming 'file' is the field name
         const image = req.files['image'][0]; // Assuming 'image' is the field name
 
@@ -16,18 +16,19 @@ const create = async (req, res) => {
         const imageName = image.originalname;
         const imagePath = image.path;
         const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const project =
+         'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))';
+        const photo =  
+"INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)";
         try {
-                await db.promise().query(
+                db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
-                        [filename, fileMimetype, filePath, date]
-                )
-                await db.promise().query(
-                        'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
-                        [title, course_name, descr, github_url, filePath])
+                        [filename, filePath, fileMimetype, date]
+                );
+                db.query(project,[title, course_name, descr, github_url, filePath])
 
-                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id, file_name, filepath, thesis_id,project_id) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?,(SELECT thesis_id FROM thesis where title =?),(SELECT project_id FROM classTeam_project where title =?))',
-                        [null, null, null, imageName, imagePath, null, title]);
-                res.json({ message: 'Thesis Create successfully' });
+                await db.promise().query(photo,[null, null, null, title, null, imageName, imagePath]);
+                // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -79,6 +80,7 @@ const remove = async (req, res) => {
                 }
         });
 };
+
 const displayAll = async (req, res) => {
 
         db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id GROUP BY cl.project_id; ', (err, results) => {
@@ -87,7 +89,6 @@ const displayAll = async (req, res) => {
                 }
                 else {
                         res.send(results);
-                        // console.log(results);¿
                 }
 
         });

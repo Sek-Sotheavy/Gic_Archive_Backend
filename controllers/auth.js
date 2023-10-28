@@ -86,7 +86,6 @@ exports.login = async function login(req, res) {
                                                                         const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name, filepath }, 't0kenEncrypti0n');
                                                                         res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
-                                                                        // res.send('access_token',token);
                                                                         console.log(id);
                                                                         return res.json({
                                                                                 status: true,
@@ -110,46 +109,14 @@ exports.login = async function login(req, res) {
                                                         })
                                                 } else {
                                                         if (results.length > 0) {
-                                                                // if (isValidPassword) {
-                                                                //         const first_name = results[0].first_name;
-                                                                //         const last_name = results[0].last_name;
-                                                                //         const name = results[0].username;
-                                                                //         const gender = results[0].gender;
-                                                                //         const email = results[0].email;
-                                                                //         const role_name = results[0].role_name;
-                                                                //         const token = jwt.sign({ first_name, last_name, email, name, gender, role_name }, 't0kenEncrypti0n');
-                                                                //         res.cookie('token', token);
-                                                                //         document.cookie;
-                                                                //         return res.json({
-                                                                //                 status: true,
-                                                                //                 data: results,
-                                                                //                 token,
-                                                                //                 message: 'Successfully authenticated'
-                                                                //         });
-
-                                                                // }
                                                                 if (isValidPassword) {
-                                                                        const {
-                                                                                first_name,
-                                                                                last_name,
-                                                                                username,
-                                                                                gender,
-                                                                                email,
-                                                                                role_name
-                                                                        } = results[0];
-
-                                                                        const token = jwt.sign({
-                                                                                first_name,
-                                                                                last_name,
-                                                                                email,
-                                                                                username,
-                                                                                gender,
-                                                                                role_name
-                                                                        }, 't0kenEncrypti0n');
-                                                                        console.log('Token set in cookie:', token);
-                                                                        res.cookie('token', token)
+                                                                        const {first_name, last_name,username,gender, email,role_name } = results[0];
+                                                                        const id = results[0].teacher_id;
+                                                                        const token = jwt.sign({ id, first_name,  last_name, email,username, gender, role_name }, 't0kenEncrypti0n');
+                                                                        console.log('access_token:', token);
+                                                                        res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
-
+                                                                        // console.log("teacher id: ",teacher_id);
                                                                         return res.json({
                                                                                 status: true,
                                                                                 data: results,
