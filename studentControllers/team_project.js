@@ -111,6 +111,7 @@ const displayById = async (req, res) => {
                 }
         });
 }
+
 const getbyCourse = async (req, res) => {
         const course_name = req.body.course_name;
         const query = 'SELECT cl.*, c.course_name from courses c join classTeam_project cl WHERE c.course_id = cl.course_id AND c.course_name =? '
@@ -131,7 +132,7 @@ const getbyCourse = async (req, res) => {
 }
 const displayByid = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT cl.*, course_name, t.username AS teacher_name, s.username AS student_name, d.fileName,d.filepath FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN students s ON s.student_id = cl.project_id JOIN documents d ON d.doc_id = cl.doc_id WHERE s.student_id = ? ';
+        const selectQuery = 'SELECT COUNT(*) AS member, cl.*, course_name, t.username AS teacher_name, s.username AS student_name, d.fileName,d.filepath, p.filepath AS imagepath FROM classteam_project cl JOIN courses c ON c.course_id = cl.course_id JOIN teachers t ON t.teacher_id = c.teacher_id JOIN students s ON s.student_id = cl.project_id JOIN documents d ON d.doc_id = cl.doc_id JOIN photo p ON p.project_id = cl.project_id JOIN classteamproject_member m ON m.project_id = cl.project_id WHERE s.student_id = ?';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
