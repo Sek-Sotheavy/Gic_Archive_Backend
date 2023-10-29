@@ -72,7 +72,7 @@ const displayAll = async (req, res) => {
 }
 const getbyprojectId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.project_id = ?;';
+        const selectQuery = 'SELECT c.*, s.username AS student_username, t.username AS teacher_username, sp.filepath , tp.filepath FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = c.student_id LEFT JOIN photo tp ON tp.teacher_id = c.teacher_id WHERE c.project_id = ?;';
       
         db.query(selectQuery, [id], (err, results) => {
           if (err) {
@@ -92,7 +92,8 @@ const getbyprojectId = async (req, res) => {
 
 const getbythesisId = async (req, res) => {
         const thesisid = req.params.thesisid;
-        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?;';
+        const selectQuery = 'SELECT c.*, s.username AS student_username, t.username AS teacher_username, sp.filepath, tp.filepath FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = c.student_id LEFT JOIN photo tp ON tp.teacher_id = c.teacher_id WHERE c.thesis_id = ?;';
+        //SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?; display for student only
         // SELECT c.*, username FROM comments c JOIN students s ON c.student_id = s.student_id WHERE s.student_id = ?
         // SELECT * FROM comments WHERE thesis_id = ?
         db.query(selectQuery, [thesisid], (err, results) => {
