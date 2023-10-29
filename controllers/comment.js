@@ -19,7 +19,7 @@ const create = async (req, res) => {
           );
       
           console.log(result);
-          res.json({ message: 'Comment created successfully'});
+          res.status(200).json({ message: 'Comment created successfully'});
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'An error occurred while creating the comment' });
@@ -31,7 +31,7 @@ const update = async (req, res) => {
     const id = req.params.id;
     const {project_id, thesis_id,student_id, comment_text } = req.body;
     const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    db.query('Update comments SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
+    db.query('Update comment SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
     [project_id,thesis_id, student_id, comment_text, timestamp ,id], (err, results) => {
         if (err) {
                 console.error('Error updating role:', err);
@@ -45,7 +45,7 @@ const update = async (req, res) => {
 }
 const remove = async (req, res) => {
   const comment_id = req.params.comment_id;
-  db.query('DELETE FROM comments WHERE  comment_id = ?', [comment_id], (err, results) => {
+  db.query('DELETE FROM comment WHERE  comment_id = ?', [comment_id], (err, results) => {
           if (err) {
                   console.error('Error updating comment:', err);
           } else {

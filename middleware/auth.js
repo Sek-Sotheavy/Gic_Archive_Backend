@@ -6,9 +6,9 @@ const checkUserLoggedIn = (req, res, next) => {
 
                 const token = req.headers['authorization'];
 
-                const tokens = req.cookies.access_token;
+                const tokens = req.Cookies.access_token;
                 console.log("cookie:", token);
-                // console.log('Token from cookie:', token);
+                console.log('Token from cookie:', tokens);
                 // const token = req.cookies;
                 if (!token) {
                         return res.json({ Message: "We need token please provide it." })
@@ -29,9 +29,9 @@ const checkUserLoggedIn = (req, res, next) => {
                                         req.generation = decoded.generation
                                         req.role_name = decoded.role_name
                                         req.filepath = decoded.filepath
-                                        console.log(req.user);
+                                        console.log(req.id);
                                         console.log(req.filepath);
-                                        // console.log(req.first_name)
+                                        
                                         next();
                                 }
                         })
