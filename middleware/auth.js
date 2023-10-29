@@ -6,9 +6,9 @@ const checkUserLoggedIn = (req, res, next) => {
 
                 const token = req.headers['authorization'];
 
-                const tokens = req.cookies.access_token;
+                const tokens = req.Cookies.access_token;
                 console.log("cookie:", token);
-                // console.log('Token from cookie:', token);
+                console.log('Token from cookie:', tokens);
                 // const token = req.cookies;
                 if (!token) {
                         return res.json({ Message: "We need token please provide it." })

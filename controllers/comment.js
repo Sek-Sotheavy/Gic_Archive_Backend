@@ -14,12 +14,12 @@ const create = async (req, res) => {
           const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
 
           const result = await db.promise().query(
-            'INSERT INTO comments (project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO comment (project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?)',
             [project_id, thesis_id, student_id, comment_text, timestamp]
           );
       
           console.log(result);
-          res.json({ message: 'Comment created successfully'});
+          res.status(200).json({ message: 'Comment created successfully'});
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'An error occurred while creating the comment' });
@@ -31,7 +31,7 @@ const update = async (req, res) => {
     const id = req.params.id;
     const {project_id, thesis_id,student_id, comment_text } = req.body;
     const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    db.query('Update comments SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
+    db.query('Update comment SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
     [project_id,thesis_id, student_id, comment_text, timestamp ,id], (err, results) => {
         if (err) {
                 console.error('Error updating role:', err);
@@ -45,7 +45,7 @@ const update = async (req, res) => {
 }
 const remove = async (req, res) => {
   const comment_id = req.params.comment_id;
-  db.query('DELETE FROM comments WHERE  comment_id = ?', [comment_id], (err, results) => {
+  db.query('DELETE FROM comment WHERE  comment_id = ?', [comment_id], (err, results) => {
           if (err) {
                   console.error('Error updating comment:', err);
           } else {
@@ -72,7 +72,7 @@ const displayAll = async (req, res) => {
 }
 const getbyprojectId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.project_id = ?;';
+        const selectQuery = 'SELECT c.*,s.username, filepath FROM comment c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.project_id = ?;';
       
         db.query(selectQuery, [id], (err, results) => {
           if (err) {
@@ -92,7 +92,7 @@ const getbyprojectId = async (req, res) => {
 
 const getbythesisId = async (req, res) => {
         const thesisid = req.params.thesisid;
-        const selectQuery = 'SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?;';
+        const selectQuery = 'SELECT c.*,s.username, filepath FROM comment c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?;';
         // SELECT c.*, username FROM comments c JOIN students s ON c.student_id = s.student_id WHERE s.student_id = ?
         // SELECT * FROM comments WHERE thesis_id = ?
         db.query(selectQuery, [thesisid], (err, results) => {
