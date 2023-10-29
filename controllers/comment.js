@@ -8,14 +8,14 @@ const create = async (req, res) => {
           return res.status(400).json({ errors: errors.array() });
         }
       
-        const { project_id, thesis_id, comment_text, student_id  } = req.body;
+        const { project_id, thesis_id, comment_text, student_id, teacher_id  } = req.body;
       
         try {
           const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
 
           const result = await db.promise().query(
-            'INSERT INTO comments (project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?)',
-            [project_id, thesis_id, student_id, comment_text, timestamp]
+            'INSERT INTO comments (project_id, thesis_id, student_id, teacher_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+            [project_id, thesis_id, student_id, teacher_id, comment_text, timestamp]
           );
       
           console.log(result);
