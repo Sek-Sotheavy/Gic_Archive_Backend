@@ -50,6 +50,7 @@ router.get('/me', auth.checkUserLoggedIn, (req, res) => {
                 return res.status(200).json({
                         status: "Success",
                         id: req.user.id,
+                        teacher_id : req.user.teacher_id,
                         first_name: req.user.first_name,
                         last_name: req.user.last_name,
                         email: req.user.email,
