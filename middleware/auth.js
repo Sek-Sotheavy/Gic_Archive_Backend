@@ -29,9 +29,9 @@ const checkUserLoggedIn = (req, res, next) => {
                                         req.generation = decoded.generation
                                         req.role_name = decoded.role_name
                                         req.filepath = decoded.filepath
-                                        console.log(req.user);
+                                        console.log(req.id);
                                         console.log(req.filepath);
-                                        // console.log(req.first_name)
+                                        
                                         next();
                                 }
                         })
