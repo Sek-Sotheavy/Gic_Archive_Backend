@@ -101,7 +101,7 @@ exports.login = async function login(req, res) {
                                 }
 
                                 else if (role === "teacher") {
-                                        db.query('SELECT t.*, r.role_name FROM users u JOIN  teachers t ON t.teacher_id = u.teacher_id JOIN roles r ON t.role_id= r.role_id  WHERE  t.email = ? ', email, (error, results) => {
+                                        db.query('SELECT t.*, r.role_name, p.filepath FROM users u JOIN  teachers t ON t.teacher_id = u.teacher_id JOIN roles r ON t.role_id= r.role_id JOIN photo p ON p.teacher_id= t.teacher_id  WHERE  t.email =?', email, (error, results) => {
                                                 if (error) {
                                                         res.json({
                                                                 status: false,
@@ -110,13 +110,14 @@ exports.login = async function login(req, res) {
                                                 } else {
                                                         if (results.length > 0) {
                                                                 if (isValidPassword) {
-                                                                        const {first_name, last_name,username,gender, email,role_name } = results[0];
+                                                                        const { first_name, last_name, username, gender, email, role_name } = results[0];
                                                                         const teacher_id = results[0].teacher_id;
-                                                                        const token = jwt.sign({ teacher_id, first_name,  last_name, email,username, gender, role_name }, 't0kenEncrypti0n');
+                                                                        const filepath = results[0].filepath;
+                                                                        const token = jwt.sign({ teacher_id, first_name, last_name, email, username, gender, role_name, filepath }, 't0kenEncrypti0n');
                                                                         console.log('access_token:', token);
                                                                         res.cookie('access_token', token)
                                                                         res.setHeader('Authorization', `Bearer ${token}`);
-                                                                        console.log("teacher id: ",teacher_id);
+                                                                        console.log("teacher id: ", teacher_id);
                                                                         return res.json({
                                                                                 status: true,
                                                                                 data: results,
