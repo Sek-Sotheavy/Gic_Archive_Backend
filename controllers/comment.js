@@ -8,18 +8,18 @@ const create = async (req, res) => {
           return res.status(400).json({ errors: errors.array() });
         }
       
-        const { project_id, thesis_id, comment_text, student_id } = req.body;
+        const { project_id, thesis_id, comment_text, student_id, teacher_id  } = req.body;
       
         try {
           const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
 
           const result = await db.promise().query(
-            'INSERT INTO comments (project_id, thesis_id, student_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?)',
-            [project_id, thesis_id, student_id, comment_text, timestamp]
+            'INSERT INTO comments (project_id, thesis_id, student_id, teacher_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+            [project_id, thesis_id, student_id, teacher_id, comment_text, timestamp]
           );
       
           console.log(result);
-          res.json({ message: 'Comment created successfully'});
+          res.status(200).json({ message: 'Comment created successfully'});
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'An error occurred while creating the comment' });
@@ -31,7 +31,7 @@ const update = async (req, res) => {
     const id = req.params.id;
     const {project_id, thesis_id,student_id, comment_text } = req.body;
     const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    db.query('Update comments SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
+    db.query('Update comment SET project_id = ?,thesis_id = ?, student_id = ? ,comment_text = ?, timestamp = ? WHERE  comment_id = ?', 
     [project_id,thesis_id, student_id, comment_text, timestamp ,id], (err, results) => {
         if (err) {
                 console.error('Error updating role:', err);
@@ -45,7 +45,7 @@ const update = async (req, res) => {
 }
 const remove = async (req, res) => {
   const comment_id = req.params.comment_id;
-  db.query('DELETE FROM comments WHERE  comment_id = ?', [comment_id], (err, results) => {
+  db.query('DELETE FROM comment WHERE  comment_id = ?', [comment_id], (err, results) => {
           if (err) {
                   console.error('Error updating comment:', err);
           } else {
@@ -70,9 +70,9 @@ const displayAll = async (req, res) => {
         //   console.log(results);
   });
 }
-const getbyId = async (req, res) => {
+const getbyprojectId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT * FROM comments WHERE project_id = ?';
+        const selectQuery = 'SELECT c.*, s.username AS student_username, t.username AS teacher_username, sp.filepath , tp.filepath FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = c.student_id LEFT JOIN photo tp ON tp.teacher_id = c.teacher_id WHERE c.project_id = ?;';
       
         db.query(selectQuery, [id], (err, results) => {
           if (err) {
@@ -90,10 +90,12 @@ const getbyId = async (req, res) => {
         });
 };
 
-const getbytheisId = async (req, res) => {
+const getbythesisId = async (req, res) => {
         const thesisid = req.params.thesisid;
-        const selectQuery = 'SELECT c.*, username FROM comments c JOIN students s ON s.student_id = c.student_id WHERE s.student_id = ?';
-      
+        const selectQuery = 'SELECT c.*, s.username AS student_username, t.username AS teacher_username, sp.filepath, tp.filepath FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = c.student_id LEFT JOIN photo tp ON tp.teacher_id = c.teacher_id WHERE c.thesis_id = ?;';
+        //SELECT c.*,s.username, filepath FROM comments c JOIN students s ON c.student_id = s.student_id JOIN photo p ON p.student_id = c.student_id WHERE c.thesis_id = ?; display for student only
+        // SELECT c.*, username FROM comments c JOIN students s ON c.student_id = s.student_id WHERE s.student_id = ?
+        // SELECT * FROM comments WHERE thesis_id = ?
         db.query(selectQuery, [thesisid], (err, results) => {
           if (err) {
             console.error('Error fetching comments:', err);
@@ -114,6 +116,6 @@ module.exports = {
     update,
     remove,
     displayAll,
-    getbyId,
-    getbytheisId
+    getbyprojectId,
+    getbythesisId
 }
