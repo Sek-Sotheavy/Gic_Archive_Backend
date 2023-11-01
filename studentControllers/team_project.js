@@ -83,7 +83,7 @@ const remove = async (req, res) => {
 
 const displayAll = async (req, res) => {
 
-        db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath, p.filepath AS imagePath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
+        db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath, p.filepath AS imagepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
                 if (err) {
                         console.error('Error fetching team project:', err);
                 }
@@ -133,7 +133,7 @@ const getbyCourse = async (req, res) => {
 }
 const displayByid = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name, t.username AS teacher_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id WHERE cl.project_id = ?  GROUP BY cl.project_id';
+        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name, t.username AS teacher_name,p.filepath AS imagepath , GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id JOIN photo p ON p.project_id = cl.project_id WHERE cl.project_id = ?  GROUP BY cl.project_id';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
