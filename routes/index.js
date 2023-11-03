@@ -44,7 +44,7 @@ const upload = multer({ storage: storage });
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                console.log(req.user.id);
+                // console.log(req.user.id);
                 console.log(req.filepath);
                 return res.status(200).json({
                         status: "Success",
