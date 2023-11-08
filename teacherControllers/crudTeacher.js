@@ -12,8 +12,8 @@ const DisplayAll = async (req, res) => {
                 }
                 else {
                         res.send(results);
+                        // console.log(results);
                 }
-                console.log(results);
         });
 }
 const getById = async (req, res) => {
@@ -71,15 +71,11 @@ const update = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db
-      .promise()
-      .query(
+   db.query(
         "UPDATE teachers SET username = ?, first_name = ?, last_name = ?, email = ?, password = ?,role_id = ?, gender = ? WHERE teacher_id = ?",
         [username, first_name, last_name, email, hashedPassword, 1, gender, id]
       );
-    await db
-      .promise()
-      .query(
+   db.query(
         "UPDATE photo SET file_name = ?, filepath = ? WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE username = ?) AND course_id = (SELECT course_id FROM courses WHERE course_name = ?) AND student_id = ?;",
         [filename, filepath, username, null, null]
       );

@@ -19,7 +19,7 @@ const signup = async (req, res) => {
             [username, null, null, filename, filepath]
         )
         db.query(
-            'INSERT INTO users (student_id, teacher_id ,rold_id) VALUES ((SELECT  student_id From students WHERE email = ?), (SELECT teacher_id From teachers WHERE username = ?),?)',
+            'INSERT INTO users (student_id, teacher_id ,role_id) VALUES ((SELECT  student_id From students WHERE email = ?), (SELECT teacher_id From teachers WHERE username = ?),?)',
             [null, username, 1]
         )
         res.json({ message: 'Teacher registered successfully' });

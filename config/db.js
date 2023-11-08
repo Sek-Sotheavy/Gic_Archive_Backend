@@ -12,16 +12,16 @@ db.connect(function (error) {
         if (error) throw error;
         console.log("Connected!");
 });
-db.query('CREATE DATABASE IF NOT EXISTS gic_archive', (createErr) => {
+db.query('CREATE DATABASE IF NOT EXISTS  gic_archive ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the database:', createErr);
                 return;
         }
 
 });
-db.query('use gic_archive');
+db.query('use gic_archive ');
 
-db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255),FOREIGN KEY (role_id) REFERENCES roles(role_id) ) ', (createErr) => {
+db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255),FOREIGN KEY(role_id) REFERENCES roles(role_id) ) ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
@@ -64,7 +64,7 @@ db.query('CREATE TABLE IF NOT EXISTS classTeam_project( project_id INT PRIMARY K
         }
 
 });
-db.query("CREATE TABLE IF NOT EXISTS photo(photo_id INT PRIMARY KEY AUTO_INCREMENT, teacher_id INT , student_id INT , course_id INT  , file_name VARCHAR(255), filepath VARCHAR(255), FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),FOREIGN KEY (student_id) REFERENCES students(student_id), FOREIGN KEY (course_id) REFERENCES courses(course_id))", (createErr) => {
+db.query("CREATE TABLE IF NOT EXISTS photo(photo_id INT PRIMARY KEY AUTO_INCREMENT, teacher_id INT , student_id INT , course_id INT,  project_id INT , thesis_id INT, file_name VARCHAR(255), filepath VARCHAR(255), FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),FOREIGN KEY (student_id) REFERENCES students(student_id), FOREIGN KEY (course_id) REFERENCES courses(course_id),FOREIGN KEY (project_id) REFERENCES classTeam_project(project_id),FOREIGN KEY (thesis_id) REFERENCES thesis(thesis_id))", (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
@@ -94,7 +94,6 @@ db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREME
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
-
 });
 
 
