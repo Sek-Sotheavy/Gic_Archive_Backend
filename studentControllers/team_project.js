@@ -28,7 +28,6 @@ const create = async (req, res) => {
                 db.query(project, [title, course_name, descr, github_url, filePath])
 
                 await db.promise().query(photo, [null, null, null, title, null, imageName, imagePath]);
-                // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -93,26 +92,6 @@ const displayAll = async (req, res) => {
 
         });
 }
-const displayById = async (req, res) => {
-        const id = req.params.id;
-        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id WHERE cl.project_id = ?  GROUP BY cl.project_id; ';
-
-        db.query(selectQuery, [id], (err, results) => {
-                if (err) {
-                        console.error('Error fetching team project:', err);
-                }
-                else {
-                        if (results.length > 0) {
-                                const thesis = results[0];
-                                console.log('team_project:', thesis);
-                                res.send(results);
-                        } else {
-                                console.log('Team project not found');
-                        }
-                }
-        });
-}
-
 const getbyCourse = async (req, res) => {
         const course_name = req.body.course_name;
         const query = 'SELECT cl.*, c.course_name from courses c join classTeam_project cl WHERE c.course_id = cl.course_id AND c.course_name =? '

@@ -41,7 +41,7 @@ const update = async (req, res) => {
         const { course_name, teacher_id, } = req.body;
         const sql = 'UPDATE courses SET course_name = ? WHERE course_id = ?';
         try {
-                db.query(sql, [course_name,id], (insertErr, results) => {
+                db.query(sql, [course_name, id], (insertErr, results) => {
                         if (insertErr) {
                                 console.error('Error update data:', insertErr);
                         } else {
@@ -106,20 +106,37 @@ const getbyCourse = async (req, res) => {
         const query = 'SELECT *, username FROM courses c join teachers t where c.teacher_id=t.teacher_id AND course_name =? '
         db.query(query, [course_name], (err, results) => {
                 if (err) {
-                        console.error('Error fetching team project:', err);
+                        console.error('Error fetching course:', err);
                 }
                 else {
                         if (results.length > 0) {
-                                const thesis = results[0];
-                                console.log('team_project:', thesis);
+                                const course = results[0];
+                                console.log('course:', course);
                                 res.send(results);
                         } else {
-                                console.log('Team project not found');
+                                console.log('Course not found');
                         }
                 }
         })
 }
-
+const getbyTeacher = async (req, res) => {
+        const username = req.params.name;
+        const query = 'SELECT c.*, t.username as name  FROM courses c join teachers t where c.teacher_id=t.teacher_id AND t.username =? '
+        db.query(query, [username], (err, results) => {
+                if (err) {
+                        console.error('Error fetching course:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const course = results[0];
+                                console.log('course:', course);
+                                res.send(results);
+                        } else {
+                                console.log('Course not found');
+                        }
+                }
+        })
+}
 module.exports = {
         create,
         remove,
@@ -127,6 +144,7 @@ module.exports = {
         update,
         getbyId,
         getbyCourse,
+        getbyTeacher
 
 }
 

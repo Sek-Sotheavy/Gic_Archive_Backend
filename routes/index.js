@@ -45,7 +45,7 @@ router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
                 console.log(req.session);
-
+                console.log(req.user.name);
                 return res.status(200).json({
                         status: "Success",
                         id: req.id,
@@ -160,6 +160,7 @@ router.post('/course/create', upload.single('image'), course.create);
 router.post('/course/remove/:id', course.remove);
 router.post('/course/update/:id', course.update);
 router.post('/search/course', course.getbyCourse);
+// router.post('/course/:name',course.getbyTeacher);
 
 //role
 router.get('/role/all', role.displayAll);
@@ -245,4 +246,8 @@ router.post('/upload/photo', upload.single('image'), photo.create);
 router.get('/student/thesis/:name', thesis.display);
 router.get('/student/project/:name', project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
+
+// teacher dashboard
+router.get('/course/:name', course.getbyTeacher);
+
 module.exports = router;
