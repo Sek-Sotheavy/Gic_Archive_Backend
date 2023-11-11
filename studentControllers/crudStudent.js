@@ -92,7 +92,7 @@ const getbyGeneration = async (req, res) => {
 const update = async (req, res) => {
         const id = req.params.id;
         const { fullname, gender, address, email, phone } = req.body;
-        db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ',
+        db.query('Update students SET fullname =?, gender=? , address=?, email=?,phone=?  WHERE  id = ? ',
                 [fullname, gender, address, email, phone, id], (err, results) => {
                         if (err) {
                                 console.error('Error updating student:', err);

@@ -44,11 +44,11 @@ const upload = multer({ storage: storage });
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                // console.log(req.user.id);
-                console.log(req.filepath);
+                console.log(req.session);
+                
                 return res.status(200).json({
                         status: "Success",
-                        id: req.user.id,
+                        id: req.id,
                         teacher_id: req.user.teacher_id,
                         first_name: req.user.first_name,
                         last_name: req.user.last_name,
@@ -134,6 +134,7 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
 router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
+router.post('/admin/thesis/update/:id', thesis.update)
 router.post('/admin/thesis/delete/:id', adminThesis.remove);
 
 //course
@@ -141,7 +142,7 @@ router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
 router.post('/course/create', upload.single('image'), course.create);
 router.post('/course/remove/:id', course.remove);
-router.post('/course/update', course.update);
+router.post('/course/update/:id', course.update);
 router.post('/search/course', course.getbyCourse);
 
 //role
@@ -188,7 +189,7 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
 
 router.get('/admin/project/all', project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
-router.post('/admin/project/update', project.update);
+router.post('/admin/project/update/:id', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
@@ -223,6 +224,6 @@ router.post('/upload/photo', upload.single('image'), photo.create);
 
 // student 
 router.get('/student/thesis/:name', thesis.display);
-router.get('/student/project/:name', project.displayByName);
+router.get('/student/project/:name', auth.ensureSignedOut, project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
 module.exports = router;

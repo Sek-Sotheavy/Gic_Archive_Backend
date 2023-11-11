@@ -118,11 +118,26 @@ const remove = async (req, res) => {
                 }
         });
 };
+const update = async (req, res) => {
+        const id = req.params.id;
+        const { title, descr, field, company, tags, github_url } = req.body;
+        db.query('UPDATE thesis SET title =? , descr = ? , company = ? , tags =? , github_url = ? WHERE  thesis_id = ? ', [title, descr, company, tags, github_url, id], (err, result) => {
+                if (err) {
+                        console.log(err);
+                        res.status(500).json({ message: 'Error updating data' })
+                }
+                else {
+                        res.json({ message: 'Data updated successfully' });
+                }
+        })
+}
+
 module.exports = {
         create,
         displayThesis,
         displayById,
         SearchbyField,
         remove,
-        display
+        display,
+        update
 }

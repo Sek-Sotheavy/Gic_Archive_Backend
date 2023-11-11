@@ -37,15 +37,15 @@ const create = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const { project_name, student_id, descr, course_id } = req.body;
+        const { title, descr, course_name } = req.body;
 
         try {
                 const result = await db.promise().query(
-                        'UPDATE classTeam_project SET project_name =? , student_id =? , descr = ? , course_id =? WHERE  project_id = ? ',
-                        [project_name, student_id, descr, course_id, id]
+                        'UPDATE classTeam_project SET title =? , course_id = (select course_id from courses where course_name = ? ), descr = ?  WHERE  project_id = ? ',
+                        [title, descr, course_name, id]
                 );
                 console.log(result);
-                res.json({ message: 'Update successfully' });
+                res.json({ message: 'Update successfully', result });
         }
         catch (error) {
                 console.error(error);
@@ -151,9 +151,9 @@ const displayByid = async (req, res) => {
         });
 }
 const displayByName = async (req, res) => {
-        const id = req.params.name;
-        // const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ? ';
-        const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = "Dalin";'
+        const id = req.params.id;
+        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.student_id = ?  ';
+        // const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = "/;'
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
