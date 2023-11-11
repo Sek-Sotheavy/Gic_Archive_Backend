@@ -170,6 +170,84 @@ const displayByName = async (req, res) => {
                 }
         });
 }
+const displayOS = async (req, res) => {
+        const course_name = 'Operating System'; 
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+      
+        db.query(selectQuery, [course_name], (err, results) => {
+          if (err) {
+            console.error('Error fetching project:', err);
+            res.status(500).send('Internal Server Error');
+          } else {
+            if (results.length > 0) {
+              console.log('Project data :', results);
+              res.send(results);
+            } else {
+              console.log('No data found');
+              res.status(404).send('No data found');
+            }
+          }
+        });
+};
+
+const displayIP = async (req, res) => {
+        const course_name = 'Internet Programming'; 
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+      
+        db.query(selectQuery, [course_name], (err, results) => {
+          if (err) {
+            console.error('Error fetching project:', err);
+            res.status(500).send('Internal Server Error');
+          } else {
+            if (results.length > 0) {
+              console.log('Project data :', results);
+              res.send(results);
+            } else {
+              console.log('No data found');
+              res.status(404).send('No data found');
+            }
+          }
+        });
+};
+const displayNetwork = async (req, res) => {
+        const course_name = 'Network'; 
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+      
+        db.query(selectQuery, [course_name], (err, results) => {
+          if (err) {
+            console.error('Error fetching project:', err);
+            res.status(500).send('Internal Server Error');
+          } else {
+            if (results.length > 0) {
+              console.log('Project data :', results);
+              res.send(results);
+            } else {
+              console.log('No data found');
+              res.status(404).send('No data found');
+            }
+          }
+        });
+};
+
+const displaySE = async (req, res) => {
+        const course_name = 'Software Engineering'; 
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+      
+        db.query(selectQuery, [course_name], (err, results) => {
+          if (err) {
+            console.error('Error fetching project:', err);
+            res.status(500).send('Internal Server Error');
+          } else {
+            if (results.length > 0) {
+              console.log('Project data :', results);
+              res.send(results);
+            } else {
+              console.log('No data found');
+              res.status(404).send('No data found');
+            }
+          }
+        });
+};
 module.exports = {
         create,
         update,
@@ -178,6 +256,10 @@ module.exports = {
         // displayById,
         getbyCourse,
         displayByid,
-        displayByName
+        displayByName,
+        displayOS,
+        displayIP,
+        displayNetwork,
+        displaySE
 
 }
