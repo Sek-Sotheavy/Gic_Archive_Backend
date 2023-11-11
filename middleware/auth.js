@@ -3,8 +3,10 @@ const secretKey = 't0kenEncrypti0n';
 
 const checkUserLoggedIn = (req, res, next) => {
         try {
-                const tokens = req.cookies.access_token;
-                console.log('Token from cookie:', tokens);
+                const tokens = req.cookies['session'];
+                console.log("session:", tokens);
+                const token = req.headers['authorization'];
+                // console.log('Token from cookie:', token);
                 if (!tokens) {
                         return res.json({ Message: "We need token please provide it." })
                 }
@@ -30,7 +32,6 @@ const checkUserLoggedIn = (req, res, next) => {
                                         next();
                                 }
                         })
-                        next();
                 }
         }
         catch (error) {

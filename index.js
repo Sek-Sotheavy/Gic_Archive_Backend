@@ -7,11 +7,12 @@ const app = express();
 
 const cors = require('cors')
 const corsOptions = {
-        origin: '*',
+        origin: true,
         credentials: true,
 };
 
 app.use(cors(corsOptions));
+
 require('./config/session')(app);
 
 app.use('/static/uploads', express.static('uploads'))

@@ -14,10 +14,10 @@ const displayThesis = async (req, res) => {
                 console.log(results);
         });
 }
-
+// student dashboard
 const display = async (req, res) => {
-
-        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.username =? ', (err, results) => {
+        const name = req.params.name
+        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.username = ? ; ', [name], (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }

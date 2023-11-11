@@ -84,9 +84,8 @@ exports.login = async function login(req, res) {
                                                                         const role_name = results[0].role_name;
                                                                         const filepath = results[0].filepath;
                                                                         const token = jwt.sign({ id, first_name, last_name, email, name, gender, generation, role_name, filepath }, 't0kenEncrypti0n', { expiresIn: '1d' });
-                                                                        res.cookie('access_token', token);
-
-                                                                        // res.setHeader('Authorization', `Bearer ${token}`);
+                                                                        // res.cookie('access_token', token);
+                                                                        res.setHeader('Authorization', `Bearer ${token}`);
                                                                         console.log(id);
                                                                         return res.json({
                                                                                 status: true,
@@ -116,12 +115,7 @@ exports.login = async function login(req, res) {
                                                                         const filepath = results[0].filepath;
                                                                         const token = jwt.sign({ teacher_id, first_name, last_name, email, username, gender, role_name, filepath }, 't0kenEncrypti0n');
                                                                         console.log('access_token:', token);
-                                                                        res.cookie("access_token", token, {
-                                                                                httpOnly: true,
-                                                                                secure: process.env.NODE_ENV === "production",
-                                                                        })
-
-                                                                        // res.setHeader('Authorization', `Bearer ${token}`);
+                                                                        res.setHeader('Authorization', `Bearer ${token}`);
                                                                         console.log("teacher id: ", teacher_id);
                                                                         return res.json({
                                                                                 status: true,
@@ -136,7 +130,7 @@ exports.login = async function login(req, res) {
                                 }
                                 else {
                                         console.log('error');
-                                        alert(res.data.error);
+                                        // alert(res.data.error);
                                 }
                         }
                 })
