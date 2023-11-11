@@ -135,7 +135,10 @@ router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
 router.post('/admin/thesis/delete/:id', adminThesis.remove);
-
+router.get('/admin/thesis/web', adminThesis.displayWeb);
+router.get('/admin/thesis/mobile', adminThesis.displayMobile);
+router.get('/admin/thesis/datascience', adminThesis.displayDataScience);
+router.get('/admin/thesis/network', adminThesis.displayNetwork);
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
@@ -192,7 +195,10 @@ router.post('/admin/project/update', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
-
+router.get('/admin/project/all/operatingsystem', project.displayOS);
+router.get('/admin/project/all/InternetProgramming', project.displayIP);
+router.get('/admin/project/all/Network', project.displayNetwork);
+router.get('/admin/project/all/SoftwareEngineering', project.displaySE);
 router.post('/project/addMember/:id', member.addMember);
 router.get('/project/member', member.CountMember);
 
