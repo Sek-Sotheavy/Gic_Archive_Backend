@@ -3,9 +3,8 @@ const db = require('../config/db');
 const addMember = (req, res) => {
         const username = req.body.username;
         const id = req.params.id;
-        const sql = "INSERT INTO classteamproject_member (project_id, student_id) VALUES (?,(SELECT student_id FROM students WHERE username = ? ";
-        db.query(sql,
-                [id, username], (err, results) => {
+        const sql = "INSERT INTO classteamproject_member (project_id, student_id) VALUES (?,(SELECT student_id FROM students WHERE username = ? ))";
+        db.query(sql,[id, username], (err, results) => {
                         if (err) {
                                 console.error('Student not found:', err);
                         }
