@@ -7,17 +7,13 @@ const create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
   const { rating_id, project_id, thesis_id, student_id,teacher_id, liked} = req.body;
-  // const liked = req.body;
-
   try {
     const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
     const result = await db.promise().query(
       "INSERT INTO ratings ( rating_id, project_id, thesis_id, student_id, teacher_id, liked, timestamp) VALUES (?,?,?,?,?,?,?)",
       [rating_id, project_id, thesis_id, student_id,teacher_id, liked, timestamp]
     );
-
     console.log(result);
     res.json({ message: "Rating created successfully" });
   } catch (error) {
