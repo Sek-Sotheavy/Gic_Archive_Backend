@@ -11,7 +11,7 @@ const create = async (req, res) => {
   const { project_id, thesis_id, comment_text, student_id, teacher_id } = req.body;
 
   try {
-    const timestamp = moment(Date()).format("YYYY-MM-DD hh:mm:ss AM/PM");
+    const timestamp = moment().format("YYYY-MM-DD hh:mm:ss AM/PM");
 
     const result = await db.promise().query(
       'INSERT INTO comments (project_id, thesis_id, student_id, teacher_id, comment_text, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
@@ -70,6 +70,7 @@ const displayAll = async (req, res) => {
     //   console.log(results);
   });
 }
+//proejct
 const getbyprojectId = async (req, res) => {
   const id = req.params.id;
   const selectQuery = 'SELECT c.*,r.role_name, s.username AS student_username, t.username AS teacher_username, sp.filepath as student_image , tp.filepath as teacher_image  FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = c.student_id LEFT JOIN photo tp ON tp.teacher_id = c.teacher_id LEFT JOIN roles r ON r.role_id = t.role_id WHERE c.project_id = ?;';
@@ -89,7 +90,7 @@ const getbyprojectId = async (req, res) => {
     }
   });
 };
-
+// thesis
 const getbythesisId = async (req, res) => {
   const thesisid = req.params.thesisid;
   const selectQuery = 'SELECT c.*,r.role_name, s.username AS student_username, t.username AS teacher_username, sp.filepath as student_image, tp.filepath as teacher_image FROM comments c LEFT JOIN students s ON c.student_id = s.student_id LEFT JOIN teachers t ON c.teacher_id = t.teacher_id LEFT JOIN photo sp ON sp.student_id = s.student_id LEFT JOIN photo tp ON tp.teacher_id = t.teacher_id LEFT JOIN roles r ON r.role_id = t.role_id WHERE c.thesis_id = ?;';

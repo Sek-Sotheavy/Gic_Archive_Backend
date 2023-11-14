@@ -58,83 +58,27 @@ const displayById = async (req, res) => {
                 }
         });
 }
-const displayWeb = async (req, res) => {
-        const field = 'Web'; // Assuming you want to compare to the string 'web'
-        const selectQuery = 'SELECT * FROM thesis WHERE field = ?';
-      
+const displayField = async (req, res) => {
+        const field = req.params.field; // Assuming you want to compare to the string 'web'
+        const selectQuery = 'SELECT t.*, p.filepath as imagePath FROM thesis t JOIN photo p ON p.thesis_id = t.thesis_id WHERE t.field = ? ';
+
         db.query(selectQuery, [field], (err, results) => {
-          if (err) {
-            console.error('Error fetching thesis:', err);
-            res.status(500).send('Internal Server Error');
-          } else {
-            if (results.length > 0) {
-              console.log('Thesis data for Web:', results);
-              res.send(results);
-            } else {
-              console.log('No data found for Web');
-              res.status(404).send('No data found for Web');
-            }
-          }
+                if (err) {
+                        console.error('Error fetching thesis:', err);
+                        res.status(500).send('Internal Server Error');
+                } else {
+                        if (results.length > 0) {
+                                console.log('Thesis data for :', results);
+                                res.send(results);
+                        } else {
+                                console.log('No data found for Web');
+                                res.status(404).send('No data found for Web');
+                        }
+                }
         });
 };
-      
-const displayMobile = async (req, res) => {
-        const field = 'Mobile'; // Assuming you want to compare to the string 'web'
-        const selectQuery = 'SELECT * FROM thesis WHERE field = ?';
-      
-        db.query(selectQuery, [field], (err, results) => {
-          if (err) {
-            console.error('Error fetching thesis:', err);
-            res.status(500).send('Internal Server Error');
-          } else {
-            if (results.length > 0) {
-              console.log('Thesis data :', results);
-              res.send(results);
-            } else {
-              console.log('No data found');
-              res.status(404).send('No data found');
-            }
-          }
-        });
-};
-const displayDataScience = async (req, res) => {
-        const field = 'Data Science'; // Assuming you want to compare to the string 'web'
-        const selectQuery = 'SELECT * FROM thesis WHERE field = ?';
-      
-        db.query(selectQuery, [field], (err, results) => {
-          if (err) {
-            console.error('Error fetching thesis:', err);
-            res.status(500).send('Internal Server Error');
-          } else {
-            if (results.length > 0) {
-              console.log('Thesis data :', results);
-              res.send(results);
-            } else {
-              console.log('No data found');
-              res.status(404).send('No data found');
-            }
-          }
-        });
-};
-const displayNetwork = async (req, res) => {
-        const field = 'Network'; // Assuming you want to compare to the string 'web'
-        const selectQuery = 'SELECT * FROM thesis WHERE field = ?';
-      
-        db.query(selectQuery, [field], (err, results) => {
-          if (err) {
-            console.error('Error fetching thesis:', err);
-            res.status(500).send('Internal Server Error');
-          } else {
-            if (results.length > 0) {
-              console.log('Thesis data :', results);
-              res.send(results);
-            } else {
-              console.log('No data found');
-              res.status(404).send('No data found');
-            }
-          }
-        });
-};
+
+
 const SearchbyField = async (req, res) => {
         const field = req.body.field;
         const selectQuery = 'SELECT t.*,s.username AS student_username, te.username AS teacher_username FROM thesis t  JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id WHERE t.field = ?';
@@ -173,9 +117,5 @@ module.exports = {
         displayById,
         SearchbyField,
         remove,
-        displayWeb,
-        displayMobile,
-        displayDataScience,
-        displayNetwork,
-        // display
+        displayField
 }

@@ -1,43 +1,42 @@
-const express = require('express');
-const multer = require('multer');
-const cookieParser = require('cookie-parser')
-const db = require('../config/db');
-const student = require('../studentControllers/auth');
-const studentList = require('../studentControllers/crudStudent');
-const teacher = require('../teacherControllers/auth');
-const { signUpSchema, signInSchema } = require('../schemas');
-const teachers = require('../teacherControllers/crudTeacher');
-const comment = require('../controllers/comment');
-const con = require('../controllers/auth');
-const thesis = require('../studentControllers/Thesis');
-const course = require('../controllers/course');
-const project = require('../studentControllers/team_project');
-const rating = require('../controllers/rating');
-const photo = require('../controllers/photo');
-const role = require('../controllers/role');
-const member = require('../studentControllers/memberproject');
-const dashboard = require('../controllers/dashboard');
-const auth = require('../middleware/auth');
-const adminThesis = require('../controllers/thesis');
-const joiValidation = require('../middleware/joiValidation');
+const express = require("express");
+const multer = require("multer");
+const cookieParser = require("cookie-parser");
+const db = require("../config/db");
+const student = require("../studentControllers/auth");
+const studentList = require("../studentControllers/crudStudent");
+const teacher = require("../teacherControllers/auth");
+const { signUpSchema, signInSchema } = require("../schemas");
+const teachers = require("../teacherControllers/crudTeacher");
+const comment = require("../controllers/comment");
+const con = require("../controllers/auth");
+const thesis = require("../studentControllers/Thesis");
+const course = require("../controllers/course");
+const project = require("../studentControllers/team_project");
+const rating = require("../controllers/rating");
+const photo = require("../controllers/photo");
+const role = require("../controllers/role");
+const member = require("../studentControllers/memberproject");
+const dashboard = require("../controllers/dashboard");
+const auth = require("../middleware/auth");
+const adminThesis = require("../controllers/thesis");
+const joiValidation = require("../middleware/joiValidation");
 
-const moment = require('moment');
+const moment = require("moment");
 
 const router = express.Router();
-
+// const multer = require("multer");
 const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-                if (file.fieldname === 'image') {
-                        cb(null, 'images')
-                }
-                else if (file.fieldname === 'file') {
-                        cb(null, 'uploads')
-                }
-        },
-        filename: (req, file, cb) => {
-                cb(null, file.originalname)
-        }
-})
+  destination: (req, file, cb) => {
+    if (file.fieldname === "image") {
+      cb(null, "images");
+    } else if (file.fieldname === "file") {
+      cb(null, "uploads");
+    }
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
 const upload = multer({ storage: storage });
 
 //
@@ -85,28 +84,47 @@ router.post('/admin/student/update/:id', studentList.update);
 // router.get('/getstudent', studentList.getStudent);
 
 //teacher-
-router.get('/admin/teacher/all', teachers.DisplayAll);
-router.post('/admin/teacher/update', teachers.update);
-router.post('/admin/teacher/delete/:id', teachers.remove);
-router.get('/admin/teacher/:id', teachers.getById);
-router.post('/admin/teacher/all/name', teachers.getByName);
+router.get("/admin/teacher/all", teachers.DisplayAll);
+router.post(
+  "/admin/teacher/update/:id",
+  upload.single("image"),
+  teachers.update
+);
+router.post("/admin/teacher/delete/:id", teachers.remove);
+router.get("/admin/teacher/:id", teachers.getById);
+router.post("/admin/teacher/all/name", teachers.getByName);
 
 //file
 // router.use(upload_file());
-router.get('/like', (req, res) => {
-        res.sendFile(__dirname + '/index.html');
+router.get("/admin/teacher/update/:id", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
 });
 //thesis
 
-router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
-        const { title, username, descr, field, company, tags, github_url, teacher_name } = req.body;
-        const file = req.files['file'][0]; // Assuming 'file' is the field name
-        const image = req.files['image'][0]; // Assuming 'image' is the field name
+router.post(
+  "/admin/thesis/create",
+  upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    const {
+      title,
+      username,
+      descr,
+      field,
+      company,
+      tags,
+      github_url,
+      teacher_name,
+    } = req.body;
+    const file = req.files["file"][0]; // Assuming 'file' is the field name
+    const image = req.files["image"][0]; // Assuming 'image' is the field name
 
-        // Access file properties
-        const fileMimetype = file.mimetype;
-        const filePath = file.path;
-        const filename = file.originalname;
+    // Access file properties
+    const fileMimetype = file.mimetype;
+    const filePath = file.path;
+    const filename = file.originalname;
 
         // Access image properties
         const imageName = image.originalname;
@@ -135,10 +153,7 @@ router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
 router.post('/admin/thesis/delete/:id', adminThesis.remove);
-router.get('/admin/thesis/web', adminThesis.displayWeb);
-router.get('/admin/thesis/mobile', adminThesis.displayMobile);
-router.get('/admin/thesis/datascience', adminThesis.displayDataScience);
-router.get('/admin/thesis/network', adminThesis.displayNetwork);
+
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
@@ -148,23 +163,29 @@ router.post('/course/update', course.update);
 router.post('/search/course', course.getbyCourse);
 
 //role
-router.get('/role/all', role.displayAll);
+router.get("/role/all", role.displayAll);
 // router.get('/role/:id', role.getbyId);
-router.post('/role/create', role.create);
-router.post('/role/remove/:id', role.remove);
-router.post('/role/update/:id', role.update);
+router.post("/role/create", role.create);
+router.post("/role/remove/:id", role.remove);
+router.post("/role/update/:id", role.update);
 
 //project
 
-router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
-        const { title, descr, course_name, github_url } = req.body;
-        const file = req.files['file'][0]; // Assuming 'file' is the field name
-        const image = req.files['image'][0]; // Assuming 'image' is the field name
+router.post(
+  "/admin/project/create",
+  upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    const { title, descr, course_name, github_url } = req.body;
+    const file = req.files["file"][0]; // Assuming 'file' is the field name
+    const image = req.files["image"][0]; // Assuming 'image' is the field name
 
-        // Access file properties
-        const fileMimetype = file.mimetype;
-        const filePath = file.path;
-        const filename = file.originalname;
+    // Access file properties
+    const fileMimetype = file.mimetype;
+    const filePath = file.path;
+    const filename = file.originalname;
 
         // Access image properties
         const imageName = image.originalname;
@@ -189,46 +210,47 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
         }
 });
 
-router.get('/admin/project/all', project.displayAll);
+router.get("/admin/project/all", project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
 router.post('/admin/project/update', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
-router.get('/admin/project/all/operatingsystem', project.displayOS);
-router.get('/admin/project/all/InternetProgramming', project.displayIP);
-router.get('/admin/project/all/Network', project.displayNetwork);
-router.get('/admin/project/all/SoftwareEngineering', project.displaySE);
+
 router.post('/project/addMember/:id', member.addMember);
 router.get('/project/member', member.CountMember);
 
 //comment
-router.post('/comment/create', comment.create);
-router.post('/comment/update/:id', comment.update);
-router.post('/comment/delete/:comment_id', comment.remove);
-router.get('/comment/project/:id', comment.getbyprojectId);
-router.get('/comment/thesis/:thesisid', comment.getbythesisId);
-router.get('/comment/all', comment.displayAll);
+router.post("/comment/create", comment.create);
+router.post("/comment/update/:id", comment.update);
+router.post("/comment/delete/:comment_id", comment.remove);
+router.get("/comment/project/:id", comment.getbyprojectId);
+router.get("/comment/thesis/:thesisid", comment.getbythesisId);
+router.get("/comment/all", comment.displayAll);
 
 //rating
-router.post('/like', rating.create);
-router.get('/countlike/:id', rating.getLike);//use for project
-router.get('/thesisliked/:id', rating.getthesisLike);//use for thesis
-router.get('/like/:id', rating.getbyId);
+router.post("/like", rating.create);
+router.get("/countlike/:id", rating.getLike); //use for project
+router.get("/thesisliked/:id", rating.getthesisLike); //use for thesis
+router.get("/like/:id", rating.getbyId);
 
 // admin dashboard
-router.get('/getCourseCount', dashboard.getCountCourse);
-router.get('/getTeacherCount', dashboard.getCountTeacher);
-router.get('/getstudentCount', dashboard.getCountStudent);
-router.get('/getFemaleCount', dashboard.getFemale);
-router.get('/getMaleCount', dashboard.getMale);
-router.get('/getThesisCount', dashboard.getCountThesis);
-router.get('/getProjectCount', dashboard.getCountProject);
+router.get("/getCourseCount", dashboard.getCountCourse);
+router.get("/getTeacherCount", dashboard.getCountTeacher);
+router.get("/getstudentCount", dashboard.getCountStudent);
+router.get("/getFemaleCount", dashboard.getFemale);
+router.get("/getMaleCount", dashboard.getMale);
+router.get("/getThesisCount", dashboard.getCountThesis);
+router.get("/getProjectCount", dashboard.getCountProject);
 // photo
-router.post('/upload/photo', upload.single('image'), photo.create);
+router.post("/upload/photo", upload.single("image"), photo.create);
 
-// student 
-router.get('/student/thesis/:name', thesis.display);
-router.get('/student/project/:name', project.displayByName);
+// student
+router.get("/student/thesis/:name", thesis.display);
+router.get("/student/project/:name", project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
+
+// teacher dashboard
+router.get('/course/:name', course.getbyTeacher);
+
 module.exports = router;
