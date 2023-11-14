@@ -249,6 +249,6 @@ router.get('/student/project/:name', project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
 
 // teacher dashboard
-router.get('/course/:name', course.getbyTeacher);
+router.get('/courses/:name', course.getbyTeacher);
 
 module.exports = router;

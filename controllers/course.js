@@ -120,8 +120,8 @@ const getbyCourse = async (req, res) => {
         })
 }
 const getbyTeacher = async (req, res) => {
-        const username = req.params.name;
-        const query = 'SELECT c.*, t.username as name  FROM courses c join teachers t where c.teacher_id=t.teacher_id AND t.username =? '
+        const username = req.params.username;
+        const query = 'SELECT c.*, t.username  FROM courses c join teachers t on c.teacher_id=t.teacher_id where t.username =? '
         db.query(query, [username], (err, results) => {
                 if (err) {
                         console.error('Error fetching course:', err);
