@@ -46,9 +46,10 @@ router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
                 console.log(req.session);
                 console.log(req.user.name);
+                console.log(req.user.id);
                 return res.status(200).json({
                         status: "Success",
-                        id: req.id,
+                        id: req.user.id,
                         teacher_id: req.user.teacher_id,
                         first_name: req.user.first_name,
                         last_name: req.user.last_name,
@@ -126,7 +127,7 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const date = moment().format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
@@ -184,7 +185,7 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const date = moment().format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',

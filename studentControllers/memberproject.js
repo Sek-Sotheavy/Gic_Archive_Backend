@@ -15,7 +15,6 @@ const addMember = (req, res) => {
                                 console.log(results);
                         }
                 });
-
 }
 
 const showMember = (req, res) => {
