@@ -28,7 +28,6 @@ const create = async (req, res) => {
                 db.query(project, [title, course_name, descr, github_url, filePath])
 
                 await db.promise().query(photo, [null, null, null, title, null, imageName, imagePath]);
-                // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -37,15 +36,15 @@ const create = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const { project_name, student_id, descr, course_id } = req.body;
+        const { title, descr, course_name } = req.body;
 
         try {
                 const result = await db.promise().query(
-                        'UPDATE classTeam_project SET project_name =? , student_id =? , descr = ? , course_id =? WHERE  project_id = ? ',
-                        [project_name, student_id, descr, course_id, id]
+                        'UPDATE classTeam_project SET title =? , course_id = (select course_id from courses where course_name = ? ), descr = ?  WHERE  project_id = ? ',
+                        [title, descr, course_name, id]
                 );
                 console.log(result);
-                res.json({ message: 'Update successfully' });
+                res.json({ message: 'Update successfully', result });
         }
         catch (error) {
                 console.error(error);
@@ -83,7 +82,7 @@ const remove = async (req, res) => {
 
 const displayAll = async (req, res) => {
 
-        db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath, p.filepath AS imagepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
+        db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  d.fileName,  d.filepath, p.filepath AS imagepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
                 if (err) {
                         console.error('Error fetching team project:', err);
                 }
@@ -93,26 +92,6 @@ const displayAll = async (req, res) => {
 
         });
 }
-const displayById = async (req, res) => {
-        const id = req.params.id;
-        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name,  GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id WHERE cl.project_id = ?  GROUP BY cl.project_id; ';
-
-        db.query(selectQuery, [id], (err, results) => {
-                if (err) {
-                        console.error('Error fetching team project:', err);
-                }
-                else {
-                        if (results.length > 0) {
-                                const thesis = results[0];
-                                console.log('team_project:', thesis);
-                                res.send(results);
-                        } else {
-                                console.log('Team project not found');
-                        }
-                }
-        });
-}
-
 const getbyCourse = async (req, res) => {
         const course_name = req.body.course_name;
         const query = 'SELECT cl.*, c.course_name from courses c join classTeam_project cl WHERE c.course_id = cl.course_id AND c.course_name =? '
@@ -151,11 +130,11 @@ const displayByid = async (req, res) => {
         });
 }
 const displayByName = async (req, res) => {
-        const id = req.params.name;
-        // const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ? ';
-        const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = "Dalin";'
+        const name = req.params.name;
+        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ?  ';
+        // const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = "/;'
 
-        db.query(selectQuery, [id], (err, results) => {
+        db.query(selectQuery, [name], (err, results) => {
                 if (err) {
                         console.error('Error fetching team project:', err);
                 }
@@ -170,6 +149,84 @@ const displayByName = async (req, res) => {
                 }
         });
 }
+const displayOS = async (req, res) => {
+        const course_name = 'Operating System';
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+
+        db.query(selectQuery, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching project:', err);
+                        res.status(500).send('Internal Server Error');
+                } else {
+                        if (results.length > 0) {
+                                console.log('Project data :', results);
+                                res.send(results);
+                        } else {
+                                console.log('No data found');
+                                res.status(404).send('No data found');
+                        }
+                }
+        });
+};
+
+const displayIP = async (req, res) => {
+        const course_name = 'Internet Programming';
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+
+        db.query(selectQuery, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching project:', err);
+                        res.status(500).send('Internal Server Error');
+                } else {
+                        if (results.length > 0) {
+                                console.log('Project data :', results);
+                                res.send(results);
+                        } else {
+                                console.log('No data found');
+                                res.status(404).send('No data found');
+                        }
+                }
+        });
+};
+const displayNetwork = async (req, res) => {
+        const course_name = 'Network';
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+
+        db.query(selectQuery, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching project:', err);
+                        res.status(500).send('Internal Server Error');
+                } else {
+                        if (results.length > 0) {
+                                console.log('Project data :', results);
+                                res.send(results);
+                        } else {
+                                console.log('No data found');
+                                res.status(404).send('No data found');
+                        }
+                }
+        });
+};
+
+const displaySE = async (req, res) => {
+        const course_name = 'Software Engineering';
+        const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
+
+        db.query(selectQuery, [course_name], (err, results) => {
+                if (err) {
+                        console.error('Error fetching project:', err);
+                        res.status(500).send('Internal Server Error');
+                } else {
+                        if (results.length > 0) {
+                                console.log('Project data :', results);
+                                res.send(results);
+                        } else {
+                                console.log('No data found');
+                                res.status(404).send('No data found');
+                        }
+                }
+        });
+};
 module.exports = {
         create,
         update,
@@ -178,6 +235,10 @@ module.exports = {
         // displayById,
         getbyCourse,
         displayByid,
-        displayByName
+        displayByName,
+        displayOS,
+        displayIP,
+        displayNetwork,
+        displaySE
 
 }

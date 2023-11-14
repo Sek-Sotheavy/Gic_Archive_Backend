@@ -41,50 +41,45 @@ const upload = multer({ storage: storage });
 
 //
 router.use(cookieParser());
-router.get("/me", auth.checkUserLoggedIn, (req, res) => {
-  try {
-    // console.log(req.user.id);
-    console.log(req.filepath);
-    return res.status(200).json({
-      status: "Success",
-      id: req.user.id,
-      teacher_id: req.user.teacher_id,
-      first_name: req.user.first_name,
-      last_name: req.user.last_name,
-      email: req.user.email,
-      name: req.user.name,
-      gender: req.user.gender,
-      generation: req.user.generation,
-      role_name: req.user.role_name,
-      filepath: req.user.filepath,
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({
-      status: "Error",
-      message: "Internal server error",
-    });
-  }
+router.get('/me', auth.checkUserLoggedIn, (req, res) => {
+        try {
+                // console.log(req.user.id);
+                console.log(req.filepath);
+                return res.status(200).json({
+                        status: "Success",
+                        id: req.user.id,
+                        teacher_id: req.user.teacher_id,
+                        first_name: req.user.first_name,
+                        last_name: req.user.last_name,
+                        email: req.user.email,
+                        name: req.user.name,
+                        gender: req.user.gender,
+                        generation: req.user.generation,
+                        role_name: req.user.role_name,
+                        filepath: req.user.filepath
+                });
+        } catch (error) {
+                console.error('Error:', error);
+                return res.status(500).json({
+                        status: 'Error',
+                        message: 'Internal server error'
+                });
+        }
 });
-router.post(
-  "/login",
-  con.login,
-  auth.ensureSignedOut,
-  joiValidation(signInSchema)
-);
-router.post("/admin/signup/teacher", upload.single("image"), teacher.signup);
-router.post("/admin/signup/student", upload.single("image"), student.signup);
-router.post("/logout", async (req, res, next) => {
-  // sessionStorage.removeItem("token");
-  return res.json({ status: "Success" });
-});
-//student
-router.get("/admin/student/all", studentList.displayAll);
-router.get("/admin/student/:id", studentList.getbyId);
-router.post("/admin/student/all/name", studentList.getbyName);
-router.post("/admin/admin/student/all/generation", studentList.getbyGeneration);
-router.post("/admin/student/delete/:id", studentList.remove);
-router.post("/admin/student/update/:id", studentList.update);
+router.post('/login', con.login, auth.ensureSignedOut, joiValidation(signInSchema));
+router.post('/admin/signup/teacher', upload.single('image'), teacher.signup);
+router.post('/admin/signup/student', upload.single('image'), student.signup);
+router.post('/logout', async (req, res, next) => {
+        // sessionStorage.removeItem("token");
+        return res.json({ status: "Success" });
+})
+//student 
+router.get('/admin/student/all', studentList.displayAll);
+router.get('/admin/student/:id', studentList.getbyId);
+router.post('/admin/student/all/name', studentList.getbyName);
+router.post('/admin/admin/student/all/generation', studentList.getbyGeneration);
+router.post('/admin/student/delete/:id', studentList.remove);
+router.post('/admin/student/update/:id', studentList.update);
 
 // router.get('/getstudent', studentList.getStudent);
 
@@ -131,56 +126,41 @@ router.post(
     const filePath = file.path;
     const filename = file.originalname;
 
-    // Access image properties
-    const imageName = image.originalname;
-    const imagePath = image.path;
-    const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    try {
-      db.query(
-        "INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)",
-        [filename, filePath, fileMimetype, date]
-      );
-      db.query(
-        "INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))",
-        [
-          title,
-          username,
-          teacher_name,
-          descr,
-          field,
-          company,
-          tags,
-          github_url,
-          filePath,
-        ]
-      );
+        // Access image properties
+        const imageName = image.originalname;
+        const imagePath = image.path;
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        try {
+                db.query(
+                        'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
+                        [filename, filePath, fileMimetype, date]
+                );
+                db.query(
+                        'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
+                        [title, username, teacher_name, descr, field, company, tags, github_url, filePath]);
 
-      await db
-        .promise()
-        .query(
-          "INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)",
-          [null, null, null, null, title, imageName, imagePath]
-        );
-      // res.json({ message: 'Thesis Create successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "An error occurred" });
-    }
-  }
-);
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
+                        [null, null, null, null, title, imageName, imagePath]);
+                // res.json({ message: 'Thesis Create successfully' });
+        }
+        catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'An error occurred' });
+        }
+});
 
-router.get("/admin/thesis/all", adminThesis.displayThesis);
-router.get("/admin/thesis/all/:id", adminThesis.displayById);
-router.post("/admin/thesis/all/field", adminThesis.SearchbyField);
-router.post("/admin/thesis/delete/:id", adminThesis.remove);
+router.get('/admin/thesis/all', adminThesis.displayThesis);
+router.get('/admin/thesis/all/:id', adminThesis.displayById);
+router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
+router.post('/admin/thesis/delete/:id', adminThesis.remove);
 
 //course
-router.get("/course/all", course.displayAll);
-router.get("/course/:id", course.getbyId);
-router.post("/course/create", upload.single("image"), course.create);
-router.post("/course/remove/:id", course.remove);
-router.post("/course/update", course.update);
-router.post("/search/course", course.getbyCourse);
+router.get('/course/all', course.displayAll);
+router.get('/course/:id', course.getbyId);
+router.post('/course/create', upload.single('image'), course.create);
+router.post('/course/remove/:id', course.remove);
+router.post('/course/update', course.update);
+router.post('/search/course', course.getbyCourse);
 
 //role
 router.get("/role/all", role.displayAll);
@@ -207,43 +187,38 @@ router.post(
     const filePath = file.path;
     const filename = file.originalname;
 
-    // Access image properties
-    const imageName = image.originalname;
-    const imagePath = image.path;
-    const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
-    try {
-      db.query(
-        "INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)",
-        [filename, filePath, fileMimetype, date]
-      );
-      db.query(
-        "INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))",
-        [title, course_name, descr, github_url, filePath]
-      );
+        // Access image properties
+        const imageName = image.originalname;
+        const imagePath = image.path;
+        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        try {
+                db.query(
+                        'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
+                        [filename, filePath, fileMimetype, date]
+                );
+                db.query(
+                        'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
+                        [title, course_name, descr, github_url, filePath])
 
-      await db
-        .promise()
-        .query(
-          "INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)",
-          [null, null, null, title, null, imageName, imagePath]
-        );
-      // res.json({ message: 'Thesis Create successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "An error occurred" });
-    }
-  }
-);
+                await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
+                        [null, null, null, title, null, imageName, imagePath]);
+                // res.json({ message: 'Thesis Create successfully' });
+        }
+        catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'An error occurred' });
+        }
+});
 
 router.get("/admin/project/all", project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
-router.post("/admin/project/update", project.update);
-router.post("/admin/project/delete/:id", project.remove);
-router.get("/admin/project/:id", project.displayByid);
-router.post("/admin/project/all/bycourse", project.getbyCourse);
+router.post('/admin/project/update', project.update);
+router.post('/admin/project/delete/:id', project.remove);
+router.get('/admin/project/:id', project.displayByid);
+router.post('/admin/project/all/bycourse', project.getbyCourse);
 
-router.post("/project/addMember/:id", member.addMember);
-router.get("/project/member", member.CountMember);
+router.post('/project/addMember/:id', member.addMember);
+router.get('/project/member', member.CountMember);
 
 //comment
 router.post("/comment/create", comment.create);
@@ -274,4 +249,8 @@ router.post("/upload/photo", upload.single("image"), photo.create);
 router.get("/student/thesis/:name", thesis.display);
 router.get("/student/project/:name", project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
+
+// teacher dashboard
+router.get('/course/:name', course.getbyTeacher);
+
 module.exports = router;
