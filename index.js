@@ -5,10 +5,6 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const app = express();
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log('Listening on port 3001'));
-
-
 const cors = require('cors')
 const corsOptions = {
         origin: true,
@@ -16,8 +12,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-require('./config/session')(app);
 
+require('./config/session')(app);
 
 app.use('/static/uploads', express.static('uploads'))
 app.use('/static/images', express.static('images'))
@@ -38,3 +34,5 @@ app.use(express.json());
 // router 
 app.use('/', require('./routes'))
 
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log('Listening on port 3001'));

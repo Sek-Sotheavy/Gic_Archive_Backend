@@ -44,8 +44,9 @@ const upload = multer({ storage: storage });
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                // console.log(req.user.id);
-                console.log(req.filepath);
+                console.log(req.session);
+                console.log(req.user.name);
+                console.log(req.user.id);
                 return res.status(200).json({
                         status: "Success",
                         id: req.user.id,
@@ -67,13 +68,28 @@ router.get('/me', auth.checkUserLoggedIn, (req, res) => {
                 });
         }
 });
+// router.get('/me', auth.checkUserLoggedIn, (req, res) => {
+//         if (req.session.user) {
+//                 res.json({ user: req.session.user });
+//                 console.log(req.session.user);
+//         } else {
+//                 res.status(401).json({ message: 'Unauthorized' });
+//         }
+// });
 router.post('/login', con.login, auth.ensureSignedOut, joiValidation(signInSchema));
 router.post('/admin/signup/teacher', upload.single('image'), teacher.signup);
 router.post('/admin/signup/student', upload.single('image'), student.signup);
 router.post('/logout', async (req, res, next) => {
-        // sessionStorage.removeItem("token");
-        return res.json({ status: "Success" });
-})
+        req.session.destroy((err) => {
+                if (err) {
+                        console.error("Error destroying session:", err);
+                        return res.status(500).json({ status: "Error" });
+                }
+                res.clearCookie('session')
+                return res.json({ status: "Success" });
+        });
+});
+
 //student 
 router.get('/admin/student/all', studentList.displayAll);
 router.get('/admin/student/:id', studentList.getbyId);
@@ -111,7 +127,7 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const date = moment().format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
@@ -134,18 +150,18 @@ router.post('/admin/thesis/create', upload.fields([{ name: 'file', maxCount: 1 }
 router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
+router.post('/admin/thesis/update/:id', thesis.update)
 router.post('/admin/thesis/delete/:id', adminThesis.remove);
-router.get('/admin/thesis/web', adminThesis.displayWeb);
-router.get('/admin/thesis/mobile', adminThesis.displayMobile);
-router.get('/admin/thesis/datascience', adminThesis.displayDataScience);
-router.get('/admin/thesis/network', adminThesis.displayNetwork);
+router.get('/admin/thesis/:field', adminThesis.displayField);
+
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
 router.post('/course/create', upload.single('image'), course.create);
 router.post('/course/remove/:id', course.remove);
-router.post('/course/update', course.update);
+router.post('/course/update/:id', course.update);
 router.post('/search/course', course.getbyCourse);
+// router.post('/course/:name',course.getbyTeacher);
 
 //role
 router.get('/role/all', role.displayAll);
@@ -169,7 +185,7 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const date = moment().format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
@@ -191,7 +207,7 @@ router.post('/admin/project/create', upload.fields([{ name: 'file', maxCount: 1 
 
 router.get('/admin/project/all', project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
-router.post('/admin/project/update', project.update);
+router.post('/admin/project/update/:id', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
@@ -231,4 +247,8 @@ router.post('/upload/photo', upload.single('image'), photo.create);
 router.get('/student/thesis/:name', thesis.display);
 router.get('/student/project/:name', project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
+
+// teacher dashboard
+router.get('/course/:name', course.getbyTeacher);
+
 module.exports = router;
