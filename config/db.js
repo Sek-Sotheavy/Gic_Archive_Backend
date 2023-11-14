@@ -84,7 +84,6 @@ db.query("CREATE TABLE IF NOT EXISTS ratings(rating_id INT PRIMARY KEY AUTO_INCR
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
-
 });
 
 db.query("CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREMENT , student_id int , teacher_id int, role_id int,  FOREIGN KEY(role_id) REFERENCES roles(role_id),FOREIGN KEY (student_id) REFERENCES students(student_id),FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id))", (createErr) => {

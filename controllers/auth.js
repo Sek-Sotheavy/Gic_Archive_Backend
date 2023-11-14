@@ -19,8 +19,6 @@ exports.logout = async function logout(req, res) {
 };
 
 exports.login = async function login(req, res) {
-        // const email = req.body.email;
-        // const password = req.body.password;
         const admin = {
                 email: "admin@123",
                 password: "admin",
