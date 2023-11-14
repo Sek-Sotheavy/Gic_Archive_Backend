@@ -4,7 +4,7 @@ const path = require('path');
 
 const displayThesis = async (req, res) => {
 
-        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id', (err, results) => {
+        db.query('SELECT t.*, d.fileName, d.filepath,p.filepath AS imagePath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id JOIN photo p ON p.thesis_id = t.thesis_id;', (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -31,7 +31,7 @@ const create = async (req, res) => {
                         'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
                         [title, username, teacher_name, descr, field, company, tags, github_url, pdfFilePath]);
                 res.json({ message: 'Create successfully' });
-                
+
         }
         catch (error) {
                 console.error(error);

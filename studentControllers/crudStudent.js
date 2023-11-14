@@ -9,6 +9,7 @@ const displayAll = async (req, res) => {
                         console.error('Error executing query:', error);
                 }
                 else {
+                        // console.log(results);
                         res.send(results);
                 }
                 console.log(results);

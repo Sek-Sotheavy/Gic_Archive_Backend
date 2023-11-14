@@ -2,20 +2,18 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 const DisplayAll = async (req, res) => {
+  const sqlQuery = "SELECT * FROM teachers ";
 
-        const sqlQuery = 'SELECT * FROM teachers ';
-
-        db.query(sqlQuery, (error, results) => {
-                if (error) {
-                        console.error('Error executing query:', error);
-                        return;
-                }
-                else {
-                        res.send(results);
-                        // console.log(results);
-                }
-        });
-}
+  db.query(sqlQuery, (error, results) => {
+    if (error) {
+      console.error("Error executing query:", error);
+      return;
+    } else {
+      res.send(results);
+      // console.log(results);
+    }
+  });
+};
 const getById = async (req, res) => {
   const id = req.params.id;
   const selectQuery = "SELECT * FROM teachers  WHERE teacher_id= ?";
@@ -71,14 +69,14 @@ const update = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-   db.query(
-        "UPDATE teachers SET username = ?, first_name = ?, last_name = ?, email = ?, password = ?,role_id = ?, gender = ? WHERE teacher_id = ?",
-        [username, first_name, last_name, email, hashedPassword, 1, gender, id]
-      );
-   db.query(
-        "UPDATE photo SET file_name = ?, filepath = ? WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE username = ?) AND course_id = (SELECT course_id FROM courses WHERE course_name = ?) AND student_id = ?;",
-        [filename, filepath, username, null, null]
-      );
+    db.query(
+      "UPDATE teachers SET username = ?, first_name = ?, last_name = ?, email = ?, password = ?,role_id = ?, gender = ? WHERE teacher_id = ?",
+      [username, first_name, last_name, email, hashedPassword, 1, gender, id]
+    );
+    db.query(
+      "UPDATE photo SET file_name = ?, filepath = ? WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE username = ?) AND course_id = (SELECT course_id FROM courses WHERE course_name = ?) AND student_id = (SELECT student_id FROM courses WHERE student_id = ?) AND student_id = (SELECT project_id FROM class WHERE student_id = ?) ;",
+      [filename, filepath, username, null, null]
+    );
     res.json({ message: "Teacher updated successfully" });
   } catch (error) {
     console.error(error);
