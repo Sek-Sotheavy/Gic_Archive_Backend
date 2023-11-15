@@ -18,6 +18,7 @@ const role = require("../controllers/role");
 const member = require("../studentControllers/memberproject");
 const dashboard = require("../controllers/dashboard");
 const auth = require("../middleware/auth");
+const courseTeacher = require('../teacherControllers/course');
 const adminThesis = require("../controllers/thesis");
 const joiValidation = require("../middleware/joiValidation");
 
@@ -158,7 +159,7 @@ router.post("/role/update/:id", role.update);
 //project
 
 router.post("/admin/project/create", upload.fields([{ name: "file", maxCount: 1 }, { name: "image", maxCount: 1 },]), async (req, res) => {
-        const { title, descr, course_name, github_url } = req.body;
+        const { title, descr, course_name, github_url, username } = req.body;
         const file = req.files["file"][0]; // Assuming 'file' is the field name
         const image = req.files["image"][0]; // Assuming 'image' is the field name
 
@@ -170,18 +171,40 @@ router.post("/admin/project/create", upload.fields([{ name: "file", maxCount: 1 
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
+        const id = req.params.id;
         const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
                         [filename, filePath, fileMimetype, date]
                 );
+                console.log(id);
                 db.query(
                         'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))',
-                        [title, course_name, descr, github_url, filePath])
+                        [title, course_name, descr, github_url, filePath], (err, results) => {
+                                if (err) {
+                                        console.error('class projet not found:', err);
+                                }
+                                else {
+                                        console.log('create successfully');
+                                        res.send('create successfully');
+                                        console.log(results);
+                                }
+                        })
 
                 await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
                         [null, null, null, title, null, imageName, imagePath]);
+                const sql = "INSERT INTO classteamproject_member (project_id, student_id) VALUES ((Select project_id from classteam_project where title = ? ),(SELECT student_id FROM students WHERE username = ? ))";
+                db.query(sql, [title, username], (err, results) => {
+                        if (err) {
+                                console.error('Student not found:', err);
+                        }
+                        else {
+                                console.log('Add member successfully');
+                                res.send('Add member successfully');
+                                console.log(results);
+                        }
+                });
                 // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
@@ -233,5 +256,6 @@ router.get("/student/project/:name", project.displayByName);
 // teacher dashboard
 router.get('/courses/:name', course.getbyTeacher);
 router.get('/project/:username', project.displayTeacherproject);
-
+router.post('/course/create/:id', courseTeacher.create);
+router.get('/course/display/:id', courseTeacher.display);
 module.exports = router;

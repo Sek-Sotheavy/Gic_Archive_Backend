@@ -20,6 +20,7 @@ const create = async (req, res) => {
                 'INSERT INTO classTeam_project (title, course_id, descr ,github_url, doc_id) VALUES (?,(SELECT course_id FROM courses WHERE course_name =?),?,?,(SELECT doc_id FROM documents WHERE filepath = ? limit 1))';
         const photo =
                 "INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)";
+
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
@@ -36,22 +37,22 @@ const create = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const name = req.body.name;
-        const sql = 'UPDATE courses SET  course_name = ? WHERE course_id = ?';
-    
+        const course_name = req.body.course_name;
+        const sql = "update courses SET course_name= ? where course_id =? ";
+
         try {
-            const [results] = await db.promise().query(sql, [name, id]);
-            if (results.affectedRows === 0) {
-                res.status(404).json({ message: 'Course not found' });
-            } else {
-                res.json({ message: 'Update successful', updatedData: { course_name: name, course_id: id } });
-            }
+                await db.promise().query(sql, [course_name, id]);
+                console.log(req.body.name);
+                console.log(id);
+
+                res.json({ message: 'Update successful', updatedData: { course_name: course_name, course_id: id } });
+
         } catch (error) {
-            console.error('Error updating data:', error);
-            res.status(500).json({ message: 'Error updating data', error: error.message });
+                console.error('Error updating data:', error);
+                res.status(500).json({ message: 'Error updating data', error: error.message });
         }
-    };
-    
+};
+
 const remove = async (req, res) => {
         const id = req.params.id;
 
@@ -83,7 +84,7 @@ const remove = async (req, res) => {
 
 const displayAll = async (req, res) => {
 
-        db.query('SELECT COUNT(*) AS member, cl.*,  c.course_name,  d.fileName,  d.filepath, p.filepath AS imagepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
+        db.query('SELECT COUNT(m.member_id) AS member, cl.*,  c.course_name,  d.fileName,  d.filepath, p.filepath AS imagepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN photo p ON p.project_id = cl.project_id GROUP BY cl.project_id; ', (err, results) => {
                 if (err) {
                         console.error('Error fetching team project:', err);
                 }
@@ -113,7 +114,7 @@ const getbyCourse = async (req, res) => {
 }
 const displayByid = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT COUNT(*) AS member, cl.*,  c.course_name, t.username AS teacher_name,p.filepath as imagepath , GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id JOIN photo p ON p.project_id = cl.project_id WHERE cl.project_id = ?  GROUP BY cl.project_id';
+        const selectQuery = 'SELECT COUNT(m.member_id) AS member, cl.*, CONCAT(t.first_name," ",t.last_name) AS fullname , c.course_name, t.username AS teacher_name,p.filepath as imagepath , GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id JOIN photo p ON p.project_id = cl.project_id WHERE cl.project_id = ?  GROUP BY cl.project_id';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
