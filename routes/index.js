@@ -129,7 +129,7 @@ router.post("/admin/thesis/create", upload.fields([{ name: "file", maxCount: 1 }
 
                 await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
                         [null, null, null, null, title, imageName, imagePath]);
-                // res.json({ message: 'Thesis Create successfully' });
+                res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
                 console.error(error);
@@ -253,6 +253,7 @@ router.post("/upload/photo", upload.single("image"), photo.create);
 // student
 
 router.get("/student/thesis/:id", thesis.display);
+router.get('/student/getTeacher', thesis.displayteacher);
 router.get("/student/project/:id", project.displayByName);
 router.post("/student/thesis/create/:id"), upload.fields([{ name: "file", maxCount: 1 }, { name: "image", maxCount: 1 },]), async (req, res) => {
         const { title, username, descr, field, company, tags, github_url, teacher_name, } = req.body;

@@ -131,6 +131,19 @@ const update = async (req, res) => {
                 }
         })
 }
+const displayteacher = async (req, res) => {
+        const sql = 'SELECT CONCAT(first_name," ",last_name) as fullname FROM teachers;'
+        db.query(sql, (err, result) => {
+                if (err) {
+                        console.log(err);
+                        res.status(500).json({ message: 'Error display data' })
+                }
+                else {
+                        res.json(result);
+                        // console.log(result);
+                }
+        })
+}
 
 module.exports = {
         create,
@@ -139,5 +152,6 @@ module.exports = {
         SearchbyField,
         remove,
         display,
-        update
+        update,
+        displayteacher
 }
