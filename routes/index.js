@@ -113,7 +113,6 @@ router.post("/admin/thesis/create", upload.fields([{ name: "file", maxCount: 1 }
         const fileMimetype = file.mimetype;
         const filePath = file.path;
         const filename = file.originalname;
-
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
