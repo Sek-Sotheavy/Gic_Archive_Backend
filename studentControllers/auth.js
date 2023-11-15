@@ -25,7 +25,7 @@ const signup = async (req, res) => {
     );
     const sql =
       "INSERT INTO users (student_id, teacher_id , role_id) VALUES ((SELECT student_id from students where username =?), ?, ?)";
-    db.query(sql, [username, null, 2]);
+    db.query(sql, [username, null,2]);
     return res.status(200).send("Student registered successfully!");
   } catch (error) {
     console.error(error);
