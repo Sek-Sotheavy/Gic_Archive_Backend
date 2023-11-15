@@ -4,7 +4,7 @@ const path = require('path');
 
 const displayThesis = async (req, res) => {
 
-        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id', (err, results) => {
+        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id ', (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -14,10 +14,10 @@ const displayThesis = async (req, res) => {
                 console.log(results);
         });
 }
-
+// student dashboard
 const display = async (req, res) => {
-
-        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.username =? ', (err, results) => {
+        const name = req.params.id;
+        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.student_id = ? ; ', [name], (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -118,11 +118,40 @@ const remove = async (req, res) => {
                 }
         });
 };
+const update = async (req, res) => {
+        const id = req.params.id;
+        const { title, descr, field, company, tags, github_url } = req.body;
+        db.query('UPDATE thesis SET title =? , descr = ? , company = ? , tags =? , github_url = ? WHERE  thesis_id = ? ', [title, descr, company, tags, github_url, id], (err, result) => {
+                if (err) {
+                        console.log(err);
+                        res.status(500).json({ message: 'Error updating data' })
+                }
+                else {
+                        res.json({ message: 'Data updated successfully' });
+                }
+        })
+}
+const displayteacher = async (req, res) => {
+        const sql = 'SELECT CONCAT(first_name," ",last_name) as fullname FROM teachers;'
+        db.query(sql, (err, result) => {
+                if (err) {
+                        console.log(err);
+                        res.status(500).json({ message: 'Error display data' })
+                }
+                else {
+                        res.json(result);
+                        // console.log(result);
+                }
+        })
+}
+
 module.exports = {
         create,
         displayThesis,
         displayById,
         SearchbyField,
         remove,
-        display
+        display,
+        update,
+        displayteacher
 }

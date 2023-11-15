@@ -23,7 +23,7 @@ const create = async (req, res) => {
                 db.query('INSERT INTO photo ( teacher_id, student_id,course_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?), ?,?)',
                         [null, null, course_name, filename, filepath], (insertErr, results) => {
                                 if (insertErr) {
-                                        console.error('Error inserting photo data:', insertErr);                  
+                                        console.error('Error inserting photo data:', insertErr);
                                 } else {
                                         console.log('photo inserted successfully');
                                         console.log(results);
@@ -36,36 +36,50 @@ const create = async (req, res) => {
         }
 }
 const update = async (req, res) => {
-        const { courseName, teacher_name, } = req.body;
+        const id = req.params.id;
+        const course_name = req.body.course_name;
+        const sql = "update courses SET course_name= ? where course_id =? ";
 
         try {
-                const result = await db.promise().query(
-                        'UPDATE courses SET course_name =? , teacher_id = (SELECT teacher_id from teachers where usename =? )where course_id =?',
-                        [courseName, teacher_name, id]
-                );
-                console.log(result);
-                res.json({ message: 'Update successfully' });
+                await db.promise().query(sql, [course_name, id]);
+                console.log(req.body.name);
+                console.log(id);
+
+                res.json({ message: 'Update successful', updatedData: { course_name: course_name, course_id: id } });
+
+        } catch (error) {
+                console.error('Error updating data:', error);
+                res.status(500).json({ message: 'Error updating data', error: error.message });
         }
-        catch (error) {
-                console.error(error);
-                res.status(500).json({ message: 'An error occurred' });
-        }
-}
+};
 const remove = async (req, res) => {
         const id = req.params.id;
-        db.query('DELETE FROM courses WHERE  course_id = ?', [id], (err, results) => {
+
+        db.query('SET FOREIGN_KEY_CHECKS=0;', (err) => {
                 if (err) {
-                        console.error('Error updating courser:', err);
+                        console.error('Error disabling foreign key checks:', err);
                 } else {
-                        res.send('Delete successfully');
-                        console.log('Delete successfully');
-                        console.log(results);
+                        db.query('DELETE FROM `courses` WHERE `course_id` = ? LIMIT 10 ;', [id], (err, results) => {
+                                if (err) {
+                                        console.error('Error deleting student:', err);
+                                } else {
+                                        console.log('Course deleted successfully');
+                                        res.status(200).send('Course deleted successfully!');
+                                        console.log(results);
+                                }
+                                db.query('SET FOREIGN_KEY_CHECKS=1;', (err) => {
+                                        if (err) {
+                                                console.error('Error enabling foreign key checks:', err);
+                                        }
+                                });
+                        });
                 }
-        })
-}
+        });
+};
 const displayAll = async (req, res) => {
 
-        const sqlQuery = 'SELECT c.*, t.username FROM courses c JOIN teachers t WHERE c.teacher_id = t.teacher_id;';
+        const sqlQuery = "SELECT c.*, CONCAT(t.first_name, ' ', t.last_name) AS fullname FROM courses c JOIN teachers t ON t.teacher_id = c.teacher_id;";
+
 
         db.query(sqlQuery, (error, results) => {
                 if (error) {
@@ -80,9 +94,11 @@ const displayAll = async (req, res) => {
 }
 const getbyId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*, t.username, p.filepath FROM courses AS c JOIN teachers AS t JOIN photo p WHERE t.teacher_id=c.teacher_id AND p.course_id =c.course_id AND c.course_id = ?';
+        const selectQuery = 'SELECT c.*, CONCAT(t.first_name, " ", t.last_name) AS fullname, t.username,p.filepath FROM courses AS c JOIN teachers AS t ON t.teacher_id = c.teacher_id JOIN photo AS p ON p.course_id = c.course_id WHERE c.course_id = ?';
+ ;
 
         db.query(selectQuery, [id], (err, results) => {
+
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -102,20 +118,37 @@ const getbyCourse = async (req, res) => {
         const query = 'SELECT *, username FROM courses c join teachers t where c.teacher_id=t.teacher_id AND course_name =? '
         db.query(query, [course_name], (err, results) => {
                 if (err) {
-                        console.error('Error fetching team project:', err);
+                        console.error('Error fetching course:', err);
                 }
                 else {
                         if (results.length > 0) {
-                                const thesis = results[0];
-                                console.log('team_project:', thesis);
+                                const course = results[0];
+                                console.log('course:', course);
                                 res.send(results);
                         } else {
-                                console.log('Team project not found');
+                                console.log('Course not found');
                         }
                 }
         })
 }
-
+const getbyTeacher = async (req, res) => {
+        const username = req.params.username;
+        const query = 'SELECT c.*, t.username  FROM courses c join teachers t on c.teacher_id=t.teacher_id where t.username =? '
+        db.query(query, [username], (err, results) => {
+                if (err) {
+                        console.error('Error fetching course:', err);
+                }
+                else {
+                        if (results.length > 0) {
+                                const course = results[0];
+                                console.log('course:', course);
+                                res.send(results);
+                        } else {
+                                console.log('Course not found');
+                        }
+                }
+        })
+}
 module.exports = {
         create,
         remove,
@@ -123,6 +156,7 @@ module.exports = {
         update,
         getbyId,
         getbyCourse,
+        getbyTeacher
 
 }
 
