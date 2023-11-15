@@ -37,16 +37,16 @@ const create = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const name = req.body.name;
-        const sql = 'UPDATE courses SET  course_name = ? WHERE course_id = ?';
+        const course_name = req.body.course_name;
+        const sql = "update courses SET course_name= ? where course_id =? ";
 
         try {
-                const [results] = await db.promise().query(sql, [name, id]);
-                if (results.affectedRows === 0) {
-                        res.status(404).json({ message: 'Course not found' });
-                } else {
-                        res.json({ message: 'Update successful', updatedData: { course_name: name, course_id: id } });
-                }
+                await db.promise().query(sql, [course_name, id]);
+                console.log(req.body.name);
+                console.log(id);
+
+                res.json({ message: 'Update successful', updatedData: { course_name: course_name, course_id: id } });
+
         } catch (error) {
                 console.error('Error updating data:', error);
                 res.status(500).json({ message: 'Error updating data', error: error.message });
@@ -78,7 +78,8 @@ const remove = async (req, res) => {
 };
 const displayAll = async (req, res) => {
 
-        const sqlQuery = 'SELECT c.*, t.username FROM courses c JOIN teachers t WHERE c.teacher_id = t.teacher_id;';
+        const sqlQuery = "SELECT c.*, CONCAT(t.first_name, ' ', t.last_name) AS fullname FROM courses c JOIN teachers t ON t.teacher_id = c.teacher_id;";
+
 
         db.query(sqlQuery, (error, results) => {
                 if (error) {
@@ -93,9 +94,11 @@ const displayAll = async (req, res) => {
 }
 const getbyId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT c.*, t.username, p.filepath FROM courses AS c JOIN teachers AS t JOIN photo p WHERE t.teacher_id=c.teacher_id AND p.course_id =c.course_id AND c.course_id = ?';
+        const selectQuery = 'SELECT c.*, CONCAT(t.first_name, " ", t.last_name) AS fullname, t.username,p.filepath FROM courses AS c JOIN teachers AS t ON t.teacher_id = c.teacher_id JOIN photo AS p ON p.course_id = c.course_id WHERE c.course_id = ?';
+ ;
 
         db.query(selectQuery, [id], (err, results) => {
+
                 if (err) {
                         console.error('Error fetching student:', err);
                 }

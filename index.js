@@ -9,7 +9,7 @@ const corsOptions = {
   origin: true,
   credentials: true,
 };
-
+app.use(express.json());
 app.use(cors(corsOptions));
 require("./config/session")(app);
 
