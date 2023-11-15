@@ -16,8 +16,8 @@ const displayThesis = async (req, res) => {
 }
 // student dashboard
 const display = async (req, res) => {
-        const name = req.params.name;
-        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.username = ? ; ', [name], (err, results) => {
+        const name = req.params.id;
+        db.query('SELECT t.*, d.fileName, d.filepath, s.username AS student_username, te.username AS teacher_username FROM thesis t JOIN teachers te ON t.teacher_id = te.teacher_id JOIN students s ON s.student_id = t.student_id JOIN documents d ON d.doc_id = t.doc_id WHERE s.student_id = ? ; ', [name], (err, results) => {
                 if (err) {
                         console.error('Error fetching student:', err);
                 }
@@ -131,6 +131,19 @@ const update = async (req, res) => {
                 }
         })
 }
+const displayteacher = async (req, res) => {
+        const sql = 'SELECT CONCAT(first_name," ",last_name) as fullname FROM teachers;'
+        db.query(sql, (err, result) => {
+                if (err) {
+                        console.log(err);
+                        res.status(500).json({ message: 'Error display data' })
+                }
+                else {
+                        res.json(result);
+                        // console.log(result);
+                }
+        })
+}
 
 module.exports = {
         create,
@@ -139,5 +152,6 @@ module.exports = {
         SearchbyField,
         remove,
         display,
-        update
+        update,
+        displayteacher
 }

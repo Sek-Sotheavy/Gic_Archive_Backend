@@ -114,7 +114,7 @@ const getbyCourse = async (req, res) => {
 }
 const displayByid = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT COUNT(m.member_id) AS member, cl.*, CONCAT(t.first_name," ",t.last_name) AS fullname , c.course_name, t.username AS teacher_name,p.filepath as imagepath , GROUP_CONCAT(s.username) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id JOIN photo p ON p.project_id = cl.project_id WHERE cl.project_id = ?  GROUP BY cl.project_id';
+        const selectQuery = 'SELECT COUNT(m.member_id) AS member, cl.*, CONCAT(t.first_name," ",t.last_name) AS fullname , c.course_name, t.username AS teacher_name,p.filepath as imagepath , GROUP_CONCAT(CONCAT(s.first_name," ",s.last_name)) AS student_names,  d.fileName,  d.filepath FROM classteam_project cl  JOIN  courses c ON c.course_id = cl.course_id JOIN  documents d ON d.doc_id = cl.doc_id  LEFT JOIN classteamproject_member m ON m.project_id = cl.project_id  LEFT JOIN students s ON s.student_id = m.student_id JOIN teachers t ON t.teacher_id =c.teacher_id JOIN photo p ON p.project_id = cl.project_id WHERE cl.project_id = ? GROUP BY cl.project_id';
 
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -132,8 +132,8 @@ const displayByid = async (req, res) => {
         });
 }
 const displayByName = async (req, res) => {
-        const name = req.params.name;
-        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.username = ?  ';
+        const name = req.params.id;
+        const selectQuery = 'SELECT cl.*, s.username, c.course_name, m.student_id FROM classteam_project cl JOIN classteamproject_member m ON m.project_id =cl.project_id JOIN students s ON s.student_id = m.student_id JOIN courses c on c.course_id = cl.course_id WHERE s.student_id = ?  ';
         // const selectQuery = 'SELECT cl.*,s.username from classteam_project cl JOIN classteamproject_member m ON m.project_id = cl.project_id JOIN students s ON s.student_id = m.student_id WHERE s.username = "/;'
 
         db.query(selectQuery, [name], (err, results) => {
@@ -170,46 +170,6 @@ const displayFilter = async (req, res) => {
                 }
         });
 };
-
-// const displayIP = async (req, res) => {
-//         const course_name = 'Internet Programming';
-//         const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
-
-//         db.query(selectQuery, [course_name], (err, results) => {
-//                 if (err) {
-//                         console.error('Error fetching project:', err);
-//                         res.status(500).send('Internal Server Error');
-//                 } else {
-//                         if (results.length > 0) {
-//                                 console.log('Project data :', results);
-//                                 res.send(results);
-//                         } else {
-//                                 console.log('No data found');
-//                                 res.status(404).send('No data found');
-//                         }
-//                 }
-//         });
-// };
-// const displayNetwork = async (req, res) => {
-//         const course_name = 'Network';
-//         const selectQuery = ' SELECT * FROM classteam_project as cl JOIN courses AS c ON cl.course_id = c.course_id WHERE course_name = ? ';
-
-//         db.query(selectQuery, [course_name], (err, results) => {
-//                 if (err) {
-//                         console.error('Error fetching project:', err);
-//                         res.status(500).send('Internal Server Error');
-//                 } else {
-//                         if (results.length > 0) {
-//                                 console.log('Project data :', results);
-//                                 res.send(results);
-//                         } else {
-//                                 console.log('No data found');
-//                                 res.status(404).send('No data found');
-//                         }
-//                 }
-//         });
-// };
-
 // teacher dashboard 
 const displayTeacherproject = async (req, res) => {
         const project = req.params.username;
