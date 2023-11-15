@@ -21,9 +21,11 @@ db.query('CREATE DATABASE IF NOT EXISTS  gic_archive ', (createErr) => {
 });
 db.query('use gic_archive ');
 
-db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255), FOREIGN KEY(role_id) REFERENCES roles(role_id) ) ', (createErr) => {
+db.query('CREATE TABLE IF NOT EXISTS students(student_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255), first_name VARCHAR(255), last_name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), role_id INT ,gender VARCHAR(255), generation VARCHAR(255),FOREIGN KEY(role_id) REFERENCES roles(role_id)) ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
+        }else{
+                console.log("create successful");
         }
 
 });
@@ -58,7 +60,7 @@ db.query('CREATE TABLE IF NOT EXISTS thesis (thesis_id INT PRIMARY KEY AUTO_INCR
                 console.log('Table created successfully');
         }
 });
-db.query('CREATE TABLE IF NOT EXISTS classTeam_project( project_id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), course_id INT, descr TEXT, github_url VARCHAR(255), doc_id  INT,  FOREIGN KEY (doc_id) REFERENCES documents(doc_id)) ', (createErr) => {
+db.query('CREATE TABLE IF NOT EXISTS classTeam_project( project_id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(255), course_id INT, descr TEXT, github_url VARCHAR(255), doc_id  INT,  FOREIGN KEY (doc_id) REFERENCES documents(doc_id),FOREIGN KEY (course_id) REFERENCES courses(course_id)) ', (createErr) => {
         if (createErr) {
                 console.error('Error creating the table:', createErr);
         }
