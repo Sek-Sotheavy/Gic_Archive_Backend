@@ -26,16 +26,16 @@ const moment = require("moment");
 const router = express.Router();
 // const multer = require("multer");
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.fieldname === "image") {
-      cb(null, "images");
-    } else if (file.fieldname === "file") {
-      cb(null, "uploads");
-    }
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
+        destination: (req, file, cb) => {
+                if (file.fieldname === "image") {
+                        cb(null, "images");
+                } else if (file.fieldname === "file") {
+                        cb(null, "uploads");
+                }
+        },
+        filename: (req, file, cb) => {
+                cb(null, file.originalname);
+        },
 });
 const upload = multer({ storage: storage });
 
@@ -86,9 +86,9 @@ router.post('/admin/student/update/:id', studentList.update);
 //teacher-
 router.get("/admin/teacher/all", teachers.DisplayAll);
 router.post(
-  "/admin/teacher/update/:id",
-  upload.single("image"),
-  teachers.update
+        "/admin/teacher/update/:id",
+        upload.single("image"),
+        teachers.update
 );
 router.post("/admin/teacher/delete/:id", teachers.remove);
 router.get("/admin/teacher/:id", teachers.getById);
@@ -97,39 +97,24 @@ router.post("/admin/teacher/all/name", teachers.getByName);
 //file
 // router.use(upload_file());
 router.get("/admin/teacher/update/:id", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+        res.sendFile(__dirname + "/index.html");
 });
 //thesis
 
-router.post(
-  "/admin/thesis/create",
-  upload.fields([
-    { name: "file", maxCount: 1 },
-    { name: "image", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    const {
-      title,
-      username,
-      descr,
-      field,
-      company,
-      tags,
-      github_url,
-      teacher_name,
-    } = req.body;
-    const file = req.files["file"][0]; // Assuming 'file' is the field name
-    const image = req.files["image"][0]; // Assuming 'image' is the field name
+router.post("/admin/thesis/create", upload.fields([{ name: "file", maxCount: 1 }, { name: "image", maxCount: 1 },]), async (req, res) => {
+        const { title, username, descr, field, company, tags, github_url, teacher_name, } = req.body;
+        const file = req.files["file"][0]; // Assuming 'file' is the field name
+        const image = req.files["image"][0]; // Assuming 'image' is the field name
 
-    // Access file properties
-    const fileMimetype = file.mimetype;
-    const filePath = file.path;
-    const filename = file.originalname;
+        // Access file properties
+        const fileMimetype = file.mimetype;
+        const filePath = file.path;
+        const filename = file.originalname;
 
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
-        const date = moment(Date()).format("YYYY-MM-DD hh:mm:ss");
+        const date = moment().format("YYYY-MM-DD hh:mm:ss");
         try {
                 db.query(
                         'INSERT INTO documents(fileName,filepath,filetype,upload_date) VALUES (?,?,?,?)',
@@ -153,13 +138,14 @@ router.get('/admin/thesis/all', adminThesis.displayThesis);
 router.get('/admin/thesis/all/:id', adminThesis.displayById);
 router.post('/admin/thesis/all/field', adminThesis.SearchbyField);
 router.post('/admin/thesis/delete/:id', adminThesis.remove);
+router.get('/admin/thesis/:field', adminThesis.displayField)
 
 //course
 router.get('/course/all', course.displayAll);
 router.get('/course/:id', course.getbyId);
 router.post('/course/create', upload.single('image'), course.create);
 router.post('/course/remove/:id', course.remove);
-router.post('/course/update', course.update);
+router.post('/course/update/:id', course.update);
 router.post('/search/course', course.getbyCourse);
 
 //role
@@ -171,21 +157,15 @@ router.post("/role/update/:id", role.update);
 
 //project
 
-router.post(
-  "/admin/project/create",
-  upload.fields([
-    { name: "file", maxCount: 1 },
-    { name: "image", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    const { title, descr, course_name, github_url } = req.body;
-    const file = req.files["file"][0]; // Assuming 'file' is the field name
-    const image = req.files["image"][0]; // Assuming 'image' is the field name
+router.post("/admin/project/create", upload.fields([{ name: "file", maxCount: 1 }, { name: "image", maxCount: 1 },]), async (req, res) => {
+        const { title, descr, course_name, github_url } = req.body;
+        const file = req.files["file"][0]; // Assuming 'file' is the field name
+        const image = req.files["image"][0]; // Assuming 'image' is the field name
 
-    // Access file properties
-    const fileMimetype = file.mimetype;
-    const filePath = file.path;
-    const filename = file.originalname;
+        // Access file properties
+        const fileMimetype = file.mimetype;
+        const filePath = file.path;
+        const filename = file.originalname;
 
         // Access image properties
         const imageName = image.originalname;
@@ -212,11 +192,11 @@ router.post(
 
 router.get("/admin/project/all", project.displayAll);
 // router.post('/admin/project/create', upload.single('file'), project.create)
-router.post('/admin/project/update', project.update);
+router.post('/admin/project/update/:id', project.update);
 router.post('/admin/project/delete/:id', project.remove);
 router.get('/admin/project/:id', project.displayByid);
 router.post('/admin/project/all/bycourse', project.getbyCourse);
-
+router.get('/admin/project/all/:course_name', project.displayFilter);
 router.post('/project/addMember/:id', member.addMember);
 router.get('/project/member', member.CountMember);
 
@@ -251,6 +231,7 @@ router.get("/student/project/:name", project.displayByName);
 // router.get('/student/thesis/:name', thesis.display);
 
 // teacher dashboard
-router.get('/course/:name', course.getbyTeacher);
+router.get('/courses/:name', course.getbyTeacher);
+router.get('/project/:username', project.displayTeacherproject);
 
 module.exports = router;

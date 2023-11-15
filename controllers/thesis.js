@@ -98,19 +98,35 @@ const SearchbyField = async (req, res) => {
                 }
         });
 }
+
 const remove = async (req, res) => {
         const id = req.params.id;
-        db.query('DELETE FROM thesis WHERE  thesis_id = ?', [id], (err, results) => {
-                if (err) {
-                        console.error('Error updating student:', err);
-                } else {
-                        console.log('Thesis delete successfully');
-                        res.send('Thesis delete successfully');
-                        console.log(results);
-                }
-        })
-}
 
+        db.query("SET FOREIGN_KEY_CHECKS=0;", (err) => {
+                if (err) {
+                        console.error("Error disabling foreign key checks:", err);
+                } else {
+                        db.query(
+                                "DELETE FROM thesis WHERE  thesis_id = ? LIMIT 10 ;",
+                                [id],
+                                (err, results) => {
+                                        if (err) {
+                                                console.error("Error deleting thesis:", err);
+                                        } else {
+                                                console.log("thesis deleted successfully");
+                                                res.status(200).send("thesis deleted successfully!");
+                                                console.log(results);
+                                        }
+                                        db.query("SET FOREIGN_KEY_CHECKS=1;", (err) => {
+                                                if (err) {
+                                                        console.error("Error enabling foreign key checks:", err);
+                                                }
+                                        });
+                                }
+                        );
+                }
+        });
+};
 module.exports = {
         create,
         displayThesis,
