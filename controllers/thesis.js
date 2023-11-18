@@ -30,7 +30,7 @@ const create = async (req, res) => {
                 await db.promise().query(
                         'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,(SELECT student_id FROM students WHERE username =? ),(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
                         [title, username, teacher_name, descr, field, company, tags, github_url, pdfFilePath]);
-                res.json({ message: 'Create successfully' });
+                // res.json({ message: 'Create successfully' });
 
         }
         catch (error) {
