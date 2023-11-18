@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 const displayAll = async (req, res) => {
 
-        const sqlQuery = 'SELECT * FROM students';
+        const sqlQuery = 'SELECT *, CONCAT(first_name," ",last_name) as fullname FROM students';
 
         db.query(sqlQuery, (error, results) => {
                 if (error) {
@@ -17,7 +17,7 @@ const displayAll = async (req, res) => {
 }
 const getbyId = async (req, res) => {
         const id = req.params.id;
-        const selectQuery = 'SELECT s.*, p.filepath FROM students as s JOIN photo AS p WHERE s.student_id = p.student_id AND s.student_id = ?; ';
+        const selectQuery = 'SELECT s.*,CONCAT(first_name," ",last_name) as fullname, p.filepath FROM students as s JOIN photo AS p WHERE s.student_id = p.student_id AND s.student_id = ?; ';
         // const selectQuery = 'SELECT * FROM students  WHERE student_id = ?';
         db.query(selectQuery, [id], (err, results) => {
                 if (err) {
@@ -91,8 +91,8 @@ const getbyGeneration = async (req, res) => {
 }
 const update = async (req, res) => {
         const id = req.params.id;
-        const { username,first_name, last_name,email, password, gender,generation } = req.body;
-        db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ', [username,first_name, last_name,email, password, gender,generation , id], (err, results) => {
+        const { username, first_name, last_name, email, password, gender, generation } = req.body;
+        db.query('Update students SET fullname =?, gender=?, address=?, email=?,phone=?  WHERE  id = ? ', [username, first_name, last_name, email, password, gender, generation, id], (err, results) => {
                 if (err) {
                         console.error('Error updating student:', err);
                 } else {
@@ -106,29 +106,29 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
         const id = req.params.id;
-    
+
         db.query('SET FOREIGN_KEY_CHECKS=0;', (err) => {
-            if (err) {
-                console.error('Error disabling foreign key checks:', err);
-            } else {
-                db.query('DELETE FROM `students` WHERE `student_id` = ? LIMIT 10 ;', [id], (err, results) => {
-                    if (err) {
-                        console.error('Error deleting student:', err);
-                    } else {
-                        console.log('Student deleted successfully');
-                        res.status(200).send('Student deleted successfully!');
-                        console.log(results);
-                    }
-                    db.query('SET FOREIGN_KEY_CHECKS=1;', (err) => {
-                        if (err) {
-                            console.error('Error enabling foreign key checks:', err);
-                        }
-                    });
-                });
-            }
+                if (err) {
+                        console.error('Error disabling foreign key checks:', err);
+                } else {
+                        db.query('DELETE FROM `students` WHERE `student_id` = ? LIMIT 10 ;', [id], (err, results) => {
+                                if (err) {
+                                        console.error('Error deleting student:', err);
+                                } else {
+                                        console.log('Student deleted successfully');
+                                        res.status(200).send('Student deleted successfully!');
+                                        console.log(results);
+                                }
+                                db.query('SET FOREIGN_KEY_CHECKS=1;', (err) => {
+                                        if (err) {
+                                                console.error('Error enabling foreign key checks:', err);
+                                        }
+                                });
+                        });
+                }
         });
-    };
-    
+};
+
 
 module.exports = {
         displayAll,
