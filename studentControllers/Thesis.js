@@ -24,7 +24,7 @@ const display = async (req, res) => {
                 else {
                         res.send(results);
                 }
-                console.log(results);
+                // console.log(results);
         });
 }
 const create = async (req, res) => {
@@ -132,7 +132,7 @@ const update = async (req, res) => {
         })
 }
 const displayteacher = async (req, res) => {
-        const sql = 'SELECT CONCAT(first_name," ",last_name) as fullname FROM teachers;'
+        const sql = 'SELECT CONCAT(first_name," ",last_name) as fullname, username FROM teachers;'
         db.query(sql, (err, result) => {
                 if (err) {
                         console.log(err);
