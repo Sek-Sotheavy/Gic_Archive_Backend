@@ -46,7 +46,7 @@ const upload = multer({ storage: storage });
 router.use(cookieParser());
 router.get('/me', auth.checkUserLoggedIn, (req, res) => {
         try {
-                // console.log(req.user.id);
+                console.log(req.user.id);
                 console.log(req.filepath);
                 return res.status(200).json({
                         status: "Success",
@@ -255,6 +255,7 @@ router.get("/student/thesis/:id", thesis.display);
 router.get('/student/getTeacher', thesis.displayteacher);
 router.get("/student/project/:id", project.displayByName);
 router.post("/student/thesis/create/:id"), upload.fields([{ name: "file", maxCount: 1 }, { name: "image", maxCount: 1 },]), async (req, res) => {
+        
         const { title, username, descr, field, company, tags, github_url, teacher_name, } = req.body;
         const file = req.files["file"][0]; // Assuming 'file' is the field name
         const image = req.files["image"][0]; // Assuming 'image' is the field name
@@ -264,7 +265,10 @@ router.post("/student/thesis/create/:id"), upload.fields([{ name: "file", maxCou
         const filePath = file.path;
         const filename = file.originalname;
         const id = req.params.id;
-        console.log(id);
+        console.log(req.params.id); // Log the student ID
+        console.log(req.body); // Log the request body
+        console.log(req.files); // Log the uploaded files
+
         // Access image properties
         const imageName = image.originalname;
         const imagePath = image.path;
@@ -275,17 +279,19 @@ router.post("/student/thesis/create/:id"), upload.fields([{ name: "file", maxCou
                         [filename, filePath, fileMimetype, date]
                 );
                 db.query(
-                        'INSERT INTO thesis(title, student_id,teacher_id ,descr, field, company, tags, github_url, doc_id) VALUES (?,?,(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
-                        [title, id, teacher_name, descr, field, company, tags, github_url, filePath]);
+                        'INSERT INTO thesis(title, student_id, teacher_id, descr, field, company, tags, github_url, doc_id) VALUES (?,?,(SELECT teacher_id FROM teachers WHERE username =? ),?,?,?,?,?,(SELECT doc_id FROM documents WHERE filepath =? limit 1))',
+                         [title, username, teacher_name, descr, field, company, tags, github_url, filePath]); 
+
 
                 await db.promise().query('INSERT INTO photo( teacher_id, student_id,course_id,project_id, thesis_id, file_name, filepath) VALUES ((SELECT  teacher_id From teachers WHERE username = ?), (SELECT  student_id From students WHERE username = ?),(SELECT course_id FROM courses where course_name =?),(SELECT project_id FROM classTeam_project WHERE title =?),(SELECT thesis_id FROM thesis where title =?), ?,?)',
                         [null, null, null, null, title, imageName, imagePath]);
                 // res.json({ message: 'Thesis Create successfully' });
         }
         catch (error) {
-                console.error(error);
-                res.status(500).json({ message: 'An error occurred' });
-        }
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred', error: error.message });
+}
+
 };
 
 
