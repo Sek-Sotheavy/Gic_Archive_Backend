@@ -13,10 +13,8 @@ const create = async (req, res) => {
                 db.query(query, [course_name, username], (Err, result) => {
                         if (Err) {
                                 console.error('Error inserting course:', Err);
-                                // res.status(500).send('Internal Server Error');
                         } else {
                                 console.log('course successfully');
-                                // res.status(200).send('course uploaded and saved');
                                 console.log(result);
                         }
                 });
@@ -95,7 +93,7 @@ const displayAll = async (req, res) => {
 const getbyId = async (req, res) => {
         const id = req.params.id;
         const selectQuery = 'SELECT c.*, CONCAT(t.first_name, " ", t.last_name) AS fullname, t.username,p.filepath FROM courses AS c JOIN teachers AS t ON t.teacher_id = c.teacher_id JOIN photo AS p ON p.course_id = c.course_id WHERE c.course_id = ?';
- ;
+        ;
 
         db.query(selectQuery, [id], (err, results) => {
 
@@ -132,7 +130,7 @@ const getbyCourse = async (req, res) => {
         })
 }
 const getbyTeacher = async (req, res) => {
-        const id= req.params.id;
+        const id = req.params.id;
         const query = 'SELECT c.*, t.username  FROM courses c join teachers t on c.teacher_id=t.teacher_id where t.teacher_id =? '
         db.query(query, [id], (err, results) => {
                 if (err) {
